@@ -1,0 +1,6 @@
+*parquet
+
+*pyc
+*pyo
+
+__pycache__
