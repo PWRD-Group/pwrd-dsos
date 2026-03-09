@@ -32,8 +32,6 @@ def _():
 def _():
     ukpn_primary_areas = gpd.read_parquet(ukpn_client["ukpn_primary_postcode_area"].file("parquet")).set_geometry("geo_shape")
     power_lines_132kv = gpd.read_parquet(ukpn_client["ukpn-132kv-overhead-lines"].file("parquet")).set_geometry("geo_shape")
-    # ukpn_primary_areas = gpd.read_parquet("ukpn_primary_postcode_area.parquet").set_geometry("geo_shape")
-    # power_lines = gpd.read_parquet("ukpn-132kv-overhead-lines.parquet").set_geometry("geo_shape")
     return power_lines_132kv, ukpn_primary_areas
 
 
