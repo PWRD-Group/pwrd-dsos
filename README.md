@@ -17,6 +17,11 @@ To use these notebooks you will need to setup the following accounts:
    to configure a `netrc` file containing your credentials.
 2. An account on <https://ukpowernetworks.opendatasoft.com>. Once you
    have an account generate an API key and place it in the file
-   `~/.config/ukpn/credentials` (making the directories if they don't
-   already exist).
-
+   `~/.config/huwise.toml` (making the directories if they don't
+   already exist), like so
+   ```toml
+   [credentials]
+   ukpowernetworks = "long-api-key"
+   ```
+   Be sure to change the visibility of that file so that only you can
+   read/write to it with `chmod 600 ~/.config/huwise.toml`
