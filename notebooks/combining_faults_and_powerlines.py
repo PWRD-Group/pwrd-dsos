@@ -7,9 +7,9 @@ with app.setup:
     import geopandas as gpd
     import marimo as mo
     import pandas as pd
-    from donalddl_pwrd import ukpn
+    from donalddl_pwrd.huwise import UKPNClient
 
-    client = ukpn.Client()
+    client = UKPNClient()
 
 
 @app.cell(hide_code=True)
