@@ -1,0 +1,171 @@
+"""A client for downloading datasets from the UKPN OpenData portal."""
+
+import logging
+import time
+from collections.abc import Mapping
+from functools import cached_property
+from pathlib import Path
+from textwrap import dedent
+from urllib.parse import quote, urlencode
+
+import httpx
+
+logger = logging.getLogger(__name__)
+
+
+def _get_api_key() -> str:
+    """Read the API key from a file in a .config directory."""
+    api_path = Path().home() / ".config" / "ukpn" / "credentials"
+    if not api_path.exists():
+        msg = dedent(f"""\
+        No API key found.
+        Create the file and put your token inside:
+        {api_path}
+        Example:
+        echo 'YOUR_API_TOKEN' > {api_path}
+        chmod 600 {api_path}
+        """)
+        raise FileNotFoundError(msg)
+
+    # Permission check: reject if group/world have any permissions.
+    if api_path.stat().st_mode & 0o077:
+        msg = dedent(f"""\
+        Credential file permissions are too permissive:
+        {api_path}
+        Fix by restricting to user-only:
+        chmod 600 {api_path}
+        """)
+        raise PermissionError(msg)
+    return api_path.read_text().strip()
+
+
+class Resource:
+    """A UKPN OpenData resource."""
+
+    def __init__(self, ukpn: "Client", info: dict) -> None:
+        self.ukpn = ukpn
+        self.info = info
+
+    @property
+    def name(self) -> str:
+        """The dataset identifier."""
+        return self.info["dataset_id"]
+
+    def __repr__(self) -> str:
+        return f"<Resource name='{self.name}'>"
+
+    def __len__(self) -> int:
+        """The record count"""
+        return int(self.info["metas"]["default"]["records_count"])
+
+    def _export_paths(self) -> dict[str, str]:
+        """A dictionary of allowed file types to export (download)."""
+        r = self.ukpn.client.get(f"/{self.name}/exports")
+        r.raise_for_status()
+        return {i["rel"]: i["href"] for i in r.json()["links"]}
+
+    def file(self, ext: str) -> Path:
+        """Get the local path to the file.
+
+        If the file doesn't exist locally in the cache, then it is
+        downloaded.
+        """
+        # TODO: Add some check for if the file has been modified
+        cache_path = self.ukpn.cache_path / f"{self.name}.{ext}"
+        if cache_path.exists():
+            return cache_path
+
+        # Otherwise we need to download this file
+        # First we should check if this exists
+        href = self._export_paths().get(ext)
+        if not href:
+            msg = f"{self.name} can not be exported as {ext}"
+            raise ValueError(msg)
+
+        logger.info("%s doesn't exist in cache... downloading", cache_path)
+        # Make the cache directory if it doesn't exist
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with (
+            cache_path.open("wb") as f,
+            self.ukpn.client.stream("GET", f"/{self.name}/exports/{ext}") as r,
+        ):
+            for data in r.iter_raw():
+                f.write(data)
+
+        return cache_path
+
+
+class Client(Mapping):
+    """A client class for querying the UKPN API."""
+
+    def __init__(self) -> None:
+        base_url = "https://ukpowernetworks.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
+        headers = {"Authorization": f"Apikey {_get_api_key()}"}
+        self.client = httpx.Client(base_url=base_url, headers=headers, timeout=30.0)
+        self.cache_path = Path("./")
+
+    def _api_call(
+        self,
+        api_url: str,
+        *,
+        limit: int = 20,
+        sleep: float = 2.0,
+        **kwargs,
+    ) -> list[dict]:
+        """Make a generic API call handling pagination."""
+        # By setting limit = 0 we get no data, just how many entries
+        # there are in the dataset
+        params = kwargs | {"limit": 0}
+        params = urlencode(params, safe="()", quote_via=quote)
+
+        r = self.client.get(api_url, params=params)
+        r.raise_for_status()
+        # Assuming that all data follows a similar pattern of
+        # total_count and results
+        total_count = r.json()["total_count"]
+
+        results = []
+
+        for offset in range(0, total_count, limit):
+            params = kwargs | {"limit": limit, "offset": offset}
+            params = urlencode(params, safe="()", quote_via=quote)
+            # Make request to API
+            r = self.client.get(api_url, params=params)
+            # Sleep for a bit so we don't make the API angry
+            time.sleep(sleep)
+            # Check that the status is good
+            r.raise_for_status()
+            # Add the results to results
+            results += r.json()["results"]
+
+        return results
+
+    @cached_property
+    def catalogue(self) -> dict[str, Resource]:
+        cat_list = self._api_call("/", limit=100, sleep=0.1)
+        catalogue = {i["dataset_id"]: Resource(self, i) for i in cat_list}
+        if len(catalogue) != len(cat_list):
+            msg = "Repeated keys in data catalogue"
+            raise ValueError(msg)
+        return catalogue
+
+    def __getitem__(self, name: str) -> Resource:
+        """Return the item as a Resource."""
+        return self.catalogue[name]
+
+    def keys(self):
+        """All keys in the catalogue."""
+        return self.catalogue.keys()
+
+    def __len__(self) -> int:
+        """The number of entries in the catalogue."""
+        return len(self.catalogue)
+
+    def __iter__(self):
+        """Iterate through the keys in the catalogue."""
+        yield from self.catalogue.keys()
+
+
+if __name__ == "__main__":
+    client = Client()
