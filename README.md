@@ -23,5 +23,6 @@ To use these notebooks you will need to setup the following accounts:
    [credentials]
    ukpowernetworks = "long-api-key"
    ```
-   Be sure to change the visibility of that file so that only you can
-   read/write to it with `chmod 600 ~/.config/huwise.toml`
+   If running on linux/mac, be sure to change the visibility of that
+   file so that only you can read/write to it with `chmod 600
+   ~/.config/huwise.toml`
