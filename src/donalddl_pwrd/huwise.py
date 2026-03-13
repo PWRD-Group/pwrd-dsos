@@ -181,5 +181,5 @@ class ENWClient(Client):
 class SPENClient(Client):
     name = "spenergynetworks"
 
-class NPClient(Client):
+class NPGClient(Client):
     name = "northernpowergrid"
