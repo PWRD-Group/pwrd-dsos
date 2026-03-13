@@ -27,16 +27,6 @@ def _get_api_key(name: str) -> str:
         """)
         raise FileNotFoundError(msg)
 
-    # Permission check: reject if group/world have any permissions.
-    if config_path.stat().st_mode & 0o077:
-        msg = dedent(f"""\
-        Credential file permissions are too permissive:
-        {config_path}
-        Fix by restricting to user-only:
-        chmod 600 {config_path}
-        """)
-        raise PermissionError(msg)
-
     with config_path.open("rb") as f:
         import tomllib
         api_key = tomllib.load(f)["credentials"][name].strip()
