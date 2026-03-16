@@ -1,5 +1,4 @@
 from zarr.storage import FsspecStore
-from pathlib import Path
 
 BASE_URL = "https://data.earthdatahub.destine.eu/era5"
 ERA5_STORAGE_OPS = {"client_kwargs": {"trust_env": True}}
