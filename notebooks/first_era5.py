@@ -32,12 +32,15 @@ def _():
 def _():
     from donalddl_pwrd.earthdatahub.era5 import land_hourly_store
     earth_ds = xr.open_dataset(land_hourly_store, chunks={}, engine="zarr")
+    earth_ds.longitude.units
     return (earth_ds,)
 
 
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
+    Note that the ERA5 data from the `earthdatahub` has longitude in units of "degrees east" (0º -> 360º), typically we want our units to be -180º to 180º. We will convert this later.
+
     We are going to work with data just inside the region covered by UK power networks. To start with, we will load the primary areas of UKPN.
     """)
     return
@@ -52,15 +55,15 @@ def _():
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    Because selecting data by area is a common operation, a helper function exists inside the `earthdatahub` sub-module, `from_area`. We give the dataset we want to select on and the `GeoDataFrame`.
+    Because selecting data by area is a common operation, a helper function exists inside the `earthdatahub` sub-module. It can be accessed through an [xarray accessor](https://docs.xarray.dev/en/stable/internals/extending-xarray.html) named `pwrd`! The accessor also has a method to convert the longitude units from 0º->360º to -180º->180º named `convert_longitude`.
     """)
     return
 
 
 @app.cell
 def _(areas, earth_ds):
-    from donalddl_pwrd.earthdatahub import from_area
-    uk_ds = from_area(earth_ds, areas)
+    uk_ds = earth_ds.pwrd.era5_from_area_bounds(areas)
+    uk_ds = uk_ds.pwrd.convert_longitude()
     return (uk_ds,)
 
 
