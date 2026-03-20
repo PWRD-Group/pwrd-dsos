@@ -8,7 +8,7 @@ with app.setup:
     import marimo as mo
     import pandas as pd
 
-    from donalddl_pwrd import ukpn
+    from donalddl_pwrd.huwise import UKPNClient
 
 
 @app.cell(hide_code=True)
@@ -27,7 +27,7 @@ def _():
 
 @app.cell
 def _():
-    client = ukpn.Client()
+    client = UKPNClient()
     # Load the primary areas and the incident data
     ukpn_primary_areas = gpd.read_parquet(client["ukpn_primary_postcode_area"].file("parquet")).set_geometry("geo_shape")
     incidents = gpd.read_parquet(client["ukpn-iis"].file("parquet"))

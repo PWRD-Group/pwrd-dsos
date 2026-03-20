@@ -1,4 +1,4 @@
-"""A client for downloading datasets from the UKPN OpenData portal."""
+"""A client for downloading datasets from a Huwise OpenData portal."""
 
 import logging
 import time
@@ -13,37 +13,32 @@ import httpx
 logger = logging.getLogger(__name__)
 
 
-def _get_api_key() -> str:
+def _get_api_key(name: str) -> str:
     """Read the API key from a file in a .config directory."""
-    api_path = Path().home() / ".config" / "ukpn" / "credentials"
-    if not api_path.exists():
+    config_path = Path().home() / ".config" / "huwise.toml"
+    if not config_path.exists():
         msg = dedent(f"""\
         No API key found.
         Create the file and put your token inside:
-        {api_path}
+        {config_path}
         Example:
-        echo 'YOUR_API_TOKEN' > {api_path}
-        chmod 600 {api_path}
+        echo 'YOUR_API_TOKEN' > {config_path}
+        chmod 600 {config_path}
         """)
         raise FileNotFoundError(msg)
 
-    # Permission check: reject if group/world have any permissions.
-    if api_path.stat().st_mode & 0o077:
-        msg = dedent(f"""\
-        Credential file permissions are too permissive:
-        {api_path}
-        Fix by restricting to user-only:
-        chmod 600 {api_path}
-        """)
-        raise PermissionError(msg)
-    return api_path.read_text().strip()
+    with config_path.open("rb") as f:
+        import tomllib
+        api_key = tomllib.load(f)["credentials"][name].strip()
+
+    return api_key
 
 
 class Resource:
-    """A UKPN OpenData resource."""
+    """A OpenData resource."""
 
-    def __init__(self, ukpn: "Client", info: dict) -> None:
-        self.ukpn = ukpn
+    def __init__(self, client: "Client", info: dict) -> None:
+        self.client = client
         self.info = info
 
     @property
@@ -60,7 +55,7 @@ class Resource:
 
     def _export_paths(self) -> dict[str, str]:
         """A dictionary of allowed file types to export (download)."""
-        r = self.ukpn.client.get(f"/{self.name}/exports")
+        r = self.client.client.get(f"/{self.name}/exports")
         r.raise_for_status()
         return {i["rel"]: i["href"] for i in r.json()["links"]}
 
@@ -71,7 +66,7 @@ class Resource:
         downloaded.
         """
         # TODO: Add some check for if the file has been modified
-        cache_path = self.ukpn.cache_path / f"{self.name}.{ext}"
+        cache_path = self.client.cache_path / f"{self.name}.{ext}"
         if cache_path.exists():
             return cache_path
 
@@ -88,7 +83,7 @@ class Resource:
 
         with (
             cache_path.open("wb") as f,
-            self.ukpn.client.stream("GET", f"/{self.name}/exports/{ext}") as r,
+            self.client.client.stream("GET", f"/{self.name}/exports/{ext}") as r,
         ):
             for data in r.iter_raw():
                 f.write(data)
@@ -97,11 +92,11 @@ class Resource:
 
 
 class Client(Mapping):
-    """A client class for querying the UKPN API."""
+    """A client class for querying a Huwise (Opendatasoft) API."""
 
     def __init__(self) -> None:
-        base_url = "https://ukpowernetworks.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
-        headers = {"Authorization": f"Apikey {_get_api_key()}"}
+        base_url = f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
+        headers = {"Authorization": f"Apikey {_get_api_key(self.name)}"}
         self.client = httpx.Client(base_url=base_url, headers=headers, timeout=30.0)
         self.cache_path = Path("./")
 
@@ -167,5 +162,14 @@ class Client(Mapping):
         yield from self.catalogue.keys()
 
 
-if __name__ == "__main__":
-    client = Client()
+class UKPNClient(Client):
+    name = "ukpowernetworks"
+
+class ENWClient(Client):
+    name = "electricitynorthwest"
+
+class SPENClient(Client):
+    name = "spenergynetworks"
+
+class NPGClient(Client):
+    name = "northernpowergrid"
