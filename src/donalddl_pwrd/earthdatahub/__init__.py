@@ -60,12 +60,14 @@ class PwrdAccessor:
 
 
 class LocalCache:
+    """A local cache for storing zarr data from earthdatahub."""
 
     def __init__(self, path=None):
         path = path or Path.cwd()
         self.path = Path(path)
 
     def create_cache_store(self, fsspec_store):
+        """Create a cache store from an existing FSSpecStore."""
         fname = Path(fsspec_store.path).name
         local_store = LocalStore(self.path / fname)
         return CacheStore(store=fsspec_store, cache_store=local_store)
