@@ -37,3 +37,6 @@ members = [
 
 [tool.uv.sources]
 donalddl-pwrd = { workspace = true, editable = true }
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
