@@ -40,6 +40,9 @@ class PwrdFaultsAccessor:
         end
             The name of the column in the incident dataframe that
             contains the incident end time.
+        reference
+            The name of the column containing the reference code
+            of the incident.
         freq
             A frequency alias.
 
