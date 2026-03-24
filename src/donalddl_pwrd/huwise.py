@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
+from typing import ClassVar
 from urllib.parse import quote, urlencode
 
 import httpx
@@ -93,6 +94,7 @@ class Resource:
 
 class Client(Mapping):
     """A client class for querying a Huwise (Opendatasoft) API."""
+    name: ClassVar[str]
 
     def __init__(self) -> None:
         base_url = f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
