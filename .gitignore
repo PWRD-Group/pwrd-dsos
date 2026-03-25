@@ -5,3 +5,5 @@
 
 __pycache__
 __marimo__
+
+.coverage
