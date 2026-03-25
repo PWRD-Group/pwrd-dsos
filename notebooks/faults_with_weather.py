@@ -198,7 +198,7 @@ def _():
     In order to combine the incident data with out newly created wind dataset, we want to convert our `incidents` `GeoDataFrame` into an `xarray`. At the same time we'll perform an `sjoin` to convert from a 2D point where the incident occured, to a polygon representing the GSP where the incident occured (which is the same level we now have the wind data). We are also going to `floor` the time that the incidents occured to the hour so we have the same time resolution as the weather data.
 
     /// Note
-    This logical now all happens inside the `incidents` module, and can be accessed using the `pwrd` accessor.
+    This logic now all happens inside the `incidents` module, and can be accessed using the `pwrd` accessor.
     ///
 
     /// Note
