@@ -21,9 +21,11 @@ marimo = [
     "cartopy>=0.25.0",
     "donalddl-pwrd",
     "geopandas>=1.1.2",
+    "joblib>=1.5.3",
     "marimo>=0.20.4",
     "matplotlib>=3.10.8",
     "pandas>=3.0.1",
+    "rioxarray>=0.22.0",
     "xarray[complete]>=2026.2.0",
     "xvec>=0.5.2",
 ]
