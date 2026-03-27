@@ -121,43 +121,10 @@ def _():
     return
 
 
-@app.function
-def make_resilence_df(df):
-    """Create a dataframe of outage and restoration customer numbers 
-    from a dataframe of incidents.
-    """
-    # We group by the start and end times (which will do a sort by default) and then 
-    # we sum up (eventually cumulatively) how many customers have been restored.
-    # This is under the assumption that customers are affected at the start of fault
-    # and restored at the end of it.
-
-    # We hard-code the column names for now, of course, 
-    # different data sources might have different names 
-    # (but hopefully the same data!)
-    start = "start_date_time"
-    end = "end_date_time"
-    customers = "customers_restored"
-
-    # sum then cumsum because a direct cumsum on a groupby does 
-    # a cumulative sum per group
-    outage = df.groupby(start)[customers].sum().cumsum()
-    restoration = df.groupby(end)[customers].sum().cumsum()
-
-
-    # ffill is used to front fill NaN values that are present in only 
-    # one of start or end times, ensuring that there is a value for every entry.
-    # Once front filling is complete NaN values are then set to 0 which sets the 
-    # first entries of the restoration column when no customers have been restored.
-    return pd.DataFrame(
-        {"outage": outage, "restoration": restoration}
-    ).ffill().fillna(0).assign(
-        resilience=lambda df: df.restoration - df.outage,
-    )
-
-
 @app.cell
 def _(incidents):
-    test = make_resilence_df(incidents)
+    import donalddl_pwrd.incidents  # For pwrd accessor
+    test = incidents.pwrd.resilience("start_date_time", "end_date_time", "customers_restored")
     return (test,)
 
 

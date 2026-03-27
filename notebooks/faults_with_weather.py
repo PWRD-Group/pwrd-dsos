@@ -198,6 +198,10 @@ def _():
     In order to combine the incident data with out newly created wind dataset, we want to convert our `incidents` `GeoDataFrame` into an `xarray`. At the same time we'll perform an `sjoin` to convert from a 2D point where the incident occured, to a polygon representing the GSP where the incident occured (which is the same level we now have the wind data). We are also going to `floor` the time that the incidents occured to the hour so we have the same time resolution as the weather data.
 
     /// Note
+    This logic now all happens inside the `incidents` module, and can be accessed using the `pwrd` accessor.
+    ///
+
+    /// Note
     We could look into making the fault data `sparse` since the majority of it is zeros.
     ///
     """)
@@ -206,56 +210,8 @@ def _():
 
 @app.cell
 def _(incidents, ukpn_gsps):
-    all_hours = pd.date_range(
-        start=incidents["start_date_time"].dt.floor("h").min(),
-        end=incidents["start_date_time"].dt.ceil("h").max(),
-        freq="h", inclusive="both",
-    ).tz_localize(None)
-
-    areas = ukpn_gsps.geometry.to_frame()
-
-    faults_xr = (
-        incidents
-            # Drop duplicate reference numbers so that we only have the main incident (not "sub-incidents")
-            .drop_duplicates("incident_reference")
-            # Perform a spatial join with GSPs so each fault is associated to a GSP
-            # how="right" keeps the geometries from the areas
-            # and includes any areas that don't contain incidents
-            .sjoin(areas, predicate="within", how="right")
-            # Make a new column in the dataframe that is the hour the fault occured
-            .assign(
-                hour=lambda df: df.start_date_time.dt.floor('h').dt.tz_localize(None)
-            )
-            # Group by GSP and hour the incident occured
-            # Keep any NA values (areas without faults)
-            .groupby([areas.index.name, "hour"], dropna=False)
-            # Find the size of each group (the number of faults / hour)
-            .size()
-            # Rename the resulting data
-            .rename("faults")
-            # Convert to an xarray.DataArray
-            .to_xarray()
-            # Reindex so that we have an entry for every hour included in the weather dataset
-            .reindex(hour=all_hours)
-            # Rename hour as valid time for consistency with weather data
-            .rename(hour="valid_time")
-            # Fill any NA values with 0
-            # (if they are NA then it means no incidents occured in that GSP in that hour)
-            .fillna(0)
-            # Lower the data precision for storage
-            .astype("int16")
-    )
-    # Now convert this so that is is `xvec` like
-    faults_xr = (
-        faults_xr
-            # Assign a new coordinate. Note need to convert Geometry array to a numpy object array
-            # The .loc call hopefully ensures that the xarray is aligned properly with the geometry
-            .assign_coords(geometry=("grid_supply_point", np.array(areas.loc[faults_xr["grid_supply_point"]].geometry)))
-            # Swap dimensions so that geometry is the dimension
-            .swap_dims(grid_supply_point="geometry")
-            .xvec.set_geom_indexes("geometry", crs=areas.crs)
-    )
-    faults_xr
+    import donalddl_pwrd.incidents
+    faults_xr = incidents.pwrd.fault_counts(ukpn_gsps, start="start_date_time", end="end_date_time", reference="incident_reference")
     return (faults_xr,)
 
 
@@ -278,14 +234,6 @@ def _(faults_xr, mean_wind):
     tester = xr.merge([faults_xr, mean_wind], join="inner", compat="equals")
     tester
     return (tester,)
-
-
-@app.cell(hide_code=True)
-def _():
-    mo.md(r"""
-
-    """)
-    return
 
 
 @app.cell(hide_code=True)
