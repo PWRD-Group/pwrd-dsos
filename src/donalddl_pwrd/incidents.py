@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
+import xvec  # noqa: F401
 
 if TYPE_CHECKING:
     import geopandas as gpd
