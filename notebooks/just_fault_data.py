@@ -8,7 +8,7 @@ with app.setup:
     import marimo as mo
     import pandas as pd
 
-    from donalddl_pwrd.huwise import UKPNClient
+    from pwrd.huwise import UKPNClient
 
 
 @app.cell(hide_code=True)
@@ -123,7 +123,7 @@ def _():
 
 @app.cell
 def _(incidents):
-    import donalddl_pwrd.incidents  # For pwrd accessor
+    import pwrd.incidents  # For pwrd accessor
     test = incidents.pwrd.resilience("start_date_time", "end_date_time", "customers_restored")
     return (test,)
 

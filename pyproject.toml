@@ -1,5 +1,5 @@
 [project]
-name = "donalddl_pwrd"
+name = "pwrd"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -23,7 +23,7 @@ dev = [
 marimo = [
     "aiohttp>=3.13.3",
     "cartopy>=0.25.0",
-    "donalddl-pwrd",
+    "pwrd",
     "geopandas>=1.1.2",
     "joblib>=1.5.3",
     "marimo>=0.20.4",
@@ -40,7 +40,7 @@ members = [
 ]
 
 [tool.uv.sources]
-donalddl-pwrd = { workspace = true, editable = true }
+pwrd = { workspace = true, editable = true }
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

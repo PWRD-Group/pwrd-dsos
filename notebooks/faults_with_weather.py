@@ -29,7 +29,7 @@ def _():
 
 @app.cell
 def _():
-    from donalddl_pwrd.earthdatahub import LocalCache, era5
+    from pwrd.earthdatahub import LocalCache, era5
 
     # We are going to cache files in the current directory
     local_cache = LocalCache()
@@ -50,7 +50,7 @@ def _():
 
 @app.cell
 def _(earth_ds):
-    from donalddl_pwrd.huwise import UKPNClient
+    from pwrd.huwise import UKPNClient
     client = UKPNClient()
     iis = client["ukpn-iis"]
     incidents = gpd.read_parquet(iis.file("parquet"))
@@ -210,7 +210,7 @@ def _():
 
 @app.cell
 def _(incidents, ukpn_gsps):
-    import donalddl_pwrd.incidents
+    import pwrd.incidents
     faults_xr = incidents.pwrd.fault_counts(ukpn_gsps, start="start_date_time", end="end_date_time", reference="incident_reference")
     return (faults_xr,)
 
