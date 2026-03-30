@@ -11,7 +11,7 @@ with app.setup:
     # For markdown
     import marimo as mo
 
-    from donalddl_pwrd.huwise import UKPNClient
+    from pwrd.huwise import UKPNClient
 
     ukpn_client = UKPNClient()
 
@@ -30,7 +30,7 @@ def _():
 
 @app.cell
 def _():
-    from donalddl_pwrd.earthdatahub.era5 import land_hourly_store
+    from pwrd.earthdatahub.era5 import land_hourly_store
     earth_ds = xr.open_dataset(land_hourly_store, chunks={}, engine="zarr")
     earth_ds.longitude.units
     return (earth_ds,)

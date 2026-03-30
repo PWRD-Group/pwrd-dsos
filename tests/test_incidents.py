@@ -7,7 +7,7 @@ import pandas as pd
 
 from shapely.geometry import Point, Polygon
 
-import donalddl_pwrd.incidents  # noqa: F401
+import pwrd.incidents  # noqa: F401
 
 
 def generate_incidents(n=20):
