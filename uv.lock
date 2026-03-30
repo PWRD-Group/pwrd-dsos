@@ -1832,7 +1832,12 @@ name = "pwrd"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "geopandas" },
     { name = "httpx" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "xvec" },
+    { name = "zarr" },
 ]
 
 [package.dev-dependencies]
@@ -1855,7 +1860,14 @@ marimo = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "httpx", specifier = ">=0.28.1" }]
+requires-dist = [
+    { name = "geopandas", specifier = ">=1.1.2" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "numpy", specifier = ">=2.4.3" },
+    { name = "pandas", specifier = ">=3.0.1" },
+    { name = "xvec", specifier = ">=0.5.2" },
+    { name = "zarr", specifier = ">=3.1.5" },
+]
 
 [package.metadata.requires-dev]
 dev = [

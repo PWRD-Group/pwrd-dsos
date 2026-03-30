@@ -1,4 +1,10 @@
-# RSG project notebooks
+# PWRD
+
+[![pipeline status](https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/badges/main/pipeline.svg)](https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/-/commits/main)
+[![coverage report](https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/badges/main/coverage.svg)](https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/-/commits/main)
+
+
+## RSG project notebooks
 
 This repository contains [marimo](https://docs.marimo.io) notebooks
 developed during the course of the RSG project: `fcod-donalddl-1`.

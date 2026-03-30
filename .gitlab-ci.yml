@@ -1,0 +1,40 @@
+# Use debian rather than alpine to try and avoid musl problems
+image: ghcr.io/astral-sh/uv:debian-slim
+
+test:
+  stage: test
+  tags:
+    - bear-gitlab-runners
+  script:
+    - uv sync --dev
+    - uv run pytest --cov=src --cov-report=xml --cov-report=term tests
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+check-notebooks:
+  stage: test
+  tags:
+    - bear-gitlab-runners
+  script:
+    - uv sync --group marimo
+    - uv run marimo check notebooks
+
+run-ty:
+  stage: test
+  tags:
+    - bear-gitlab-runners
+  script:
+    - uv sync
+    - uvx ty check src
+
+run-ruff:
+  stage: test
+  tags:
+    - bear-gitlab-runners
+  script:
+    - uv sync
+    - uvx ruff check src
