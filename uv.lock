@@ -1832,10 +1832,13 @@ name = "pwrd"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "aiohttp" },
+    { name = "fsspec" },
     { name = "geopandas" },
     { name = "httpx" },
     { name = "numpy" },
     { name = "pandas" },
+    { name = "requests" },
     { name = "xvec" },
     { name = "zarr" },
 ]
@@ -1862,10 +1865,13 @@ marimo = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.13.3" },
+    { name = "fsspec", specifier = ">=2026.2.0" },
     { name = "geopandas", specifier = ">=1.1.2" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "numpy", specifier = ">=2.4.3" },
     { name = "pandas", specifier = ">=3.0.1" },
+    { name = "requests", specifier = ">=2.32.5" },
     { name = "xvec", specifier = ">=0.5.2" },
     { name = "zarr", specifier = ">=3.1.5" },
 ]
