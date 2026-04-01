@@ -13,10 +13,10 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_CONFIG_PATH = Path().home() / ".config" / "huwise.toml"
 
-def _get_api_key(name: str) -> str:
+def _get_api_key(name: str, config_path: Path = DEFAULT_CONFIG_PATH) -> str:
     """Read the API key from a file in a .config directory."""
-    config_path = Path().home() / ".config" / "huwise.toml"
     if not config_path.exists():
         msg = dedent(f"""\
         No API key found.
