@@ -7,18 +7,16 @@ import xvec  # noqa: F401
 if TYPE_CHECKING:
     import geopandas as gpd
     import xarray as xr
-    # Type alias for an xarray Dataset or DataArray
-    XrLike = xr.Dataset | xr.DataArray
-    
 
-def _xarray_to_xvec(xarr: XrLike, areas: gpd.GeoDataFrame) -> XrLike:
+
+def _xarray_to_xvec(xarr: xr.DataArray, areas: gpd.GeoDataFrame) -> xr.DataArray:
     """Convert an xarray to a xvec compatible format using a GeoDataFrame."""
 
     name = areas.index.name
     # This should be the geometries in the same order as the index of
     # xarr
     geometries = np.array(areas.loc[xarr[name]].geometry)
-    
+
     return (
         xarr
         # Assign a new coordinate. Note need to convert Geometry
@@ -27,7 +25,5 @@ def _xarray_to_xvec(xarr: XrLike, areas: gpd.GeoDataFrame) -> XrLike:
         # geometry
         .assign_coords(geometry=(name, geometries))
         .swap_dims({name: "geometry"})
-        .xvec
-        .set_geom_indexes("geometry", crs=areas.crs)
+        .xvec.set_geom_indexes("geometry", crs=areas.crs)
     )
-    

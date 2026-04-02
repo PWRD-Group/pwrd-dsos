@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pandas as pd
 import xvec  # noqa: F401
 
@@ -110,20 +109,6 @@ class PwrdFaultsAccessor:
         )
 
         return _xarray_to_xvec(faults_xr, areas)
-
-        # return (
-        #     faults_xr
-        #     # Assign a new coordinate. Note need to convert Geometry
-        #     # array to a numpy object array The .loc call hopefully
-        #     # ensures that the xarray is aligned properly with the
-        #     # geometry
-        #     .assign_coords(
-        #         geometry=(name, np.array(areas.loc[faults_xr[name]].geometry)),
-        #     )
-        #     # Swap dimensions so that geometry is the dimension
-        #     .swap_dims({name: "geometry"})
-        #     .xvec.set_geom_indexes("geometry", crs=areas.crs)
-        # )
 
     def resilience(self, start: str, end: str, customers: str) -> pd.DataFrame:
         """Create a resilience dataframe.
