@@ -41,7 +41,9 @@ def line_length_in_areas(
 
 
 class Mixin:
-    def line_length_in_areas(self, areas, crs):
+    # To satisfy the type checker
+    _df: gpd.GeoDataFrame
 
+    def line_length_in_areas(self, areas, crs):
         out = line_length_in_areas(self._df, areas, crs)
         return xarray_to_xvec(out.to_xarray(), areas)

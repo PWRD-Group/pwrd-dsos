@@ -1,4 +1,4 @@
-import pandas as pd
+import geopandas as gpd
 from pandas.api.extensions import register_dataframe_accessor
 
 from pwrd import grouping, incidents
@@ -9,5 +9,5 @@ class PwrdDataFrameAccessor(
     grouping.Mixin,
     incidents.Mixin,
 ):
-    def __init__(self, df: pd.DataFrame) -> None:
+    def __init__(self, df: gpd.GeoDataFrame) -> None:
         self._df = df

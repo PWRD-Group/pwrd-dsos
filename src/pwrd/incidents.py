@@ -16,6 +16,10 @@ if TYPE_CHECKING:
 
 class Mixin:
     """Pandas DataFrame accessor for working with fault/incident data."""
+
+    # To satisfy the type checker
+    _df: gpd.GeoDataFrame
+
     def fault_counts(
         self,
         areas: gpd.GeoDataFrame,
