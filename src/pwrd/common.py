@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     import xarray as xr
 
 
-def _xarray_to_xvec(xarr: xr.DataArray, areas: gpd.GeoDataFrame) -> xr.DataArray:
+def xarray_to_xvec(xarr: xr.DataArray, areas: gpd.GeoDataFrame) -> xr.DataArray:
     """Convert an xarray to a xvec compatible format using a GeoDataFrame.
 
     Returns

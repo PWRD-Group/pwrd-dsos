@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 import xvec  # noqa: F401
 
-from pwrd.common import _xarray_to_xvec
+from pwrd.common import xarray_to_xvec
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -108,7 +108,7 @@ class PwrdFaultsAccessor:
             .fillna(0)
         )
 
-        return _xarray_to_xvec(faults_xr, areas)
+        return xarray_to_xvec(faults_xr, areas)
 
     def resilience(self, start: str, end: str, customers: str) -> pd.DataFrame:
         """Create a resilience dataframe.
