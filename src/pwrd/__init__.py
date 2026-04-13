@@ -9,5 +9,11 @@ class PwrdDataFrameAccessor(
     grouping.Mixin,
     incidents.Mixin,
 ):
+    """The main point of access for operations on dataframes.
+
+    This class is constructed of 'Mixin' classes that are defined in
+    various submodules.
+    """
+
     def __init__(self, df: gpd.GeoDataFrame) -> None:
         self._df = df
