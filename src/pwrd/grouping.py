@@ -40,10 +40,30 @@ def line_length_in_areas(
     return total_line_length.reindex_like(areas).fillna(0)
 
 
+def points_in_areas(points, areas):
+
+    # Group by the index
+    index_name = areas.index.name
+    if index_name is None:
+        msg = "areas must be supplied with a named index"
+        raise ValueError(msg)
+
+    return (
+        areas.sjoin(points, predicate="contains", how="left")
+        .groupby(index_name)["index_right"]
+        .count()
+        .rename("count")
+    )
+
+
 class Mixin:
     # To satisfy the type checker
     _df: gpd.GeoDataFrame
 
     def line_length_in_areas(self, areas, crs):
         out = line_length_in_areas(self._df, areas, crs)
+        return xarray_to_xvec(out.to_xarray(), areas)
+
+    def points_in_areas(self, areas):
+        out = points_in_areas(self._df, areas)
         return xarray_to_xvec(out.to_xarray(), areas)
