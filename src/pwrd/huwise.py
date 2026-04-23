@@ -30,6 +30,7 @@ def _get_api_key(name: str, config_path: Path = DEFAULT_CONFIG_PATH) -> str:
 
     with config_path.open("rb") as f:
         import tomllib
+
         api_key = tomllib.load(f)["credentials"][name].strip()
 
     return api_key
@@ -94,10 +95,13 @@ class Resource:
 
 class Client(Mapping):
     """A client class for querying a Huwise (Opendatasoft) API."""
+
     name: ClassVar[str]
 
     def __init__(self) -> None:
-        base_url = f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
+        base_url = (
+            f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
+        )
         headers = {"Authorization": f"Apikey {_get_api_key(self.name)}"}
         self.client = httpx.Client(base_url=base_url, headers=headers, timeout=30.0)
         self.cache_path = Path("./")
@@ -167,11 +171,14 @@ class Client(Mapping):
 class UKPNClient(Client):
     name = "ukpowernetworks"
 
+
 class ENWClient(Client):
     name = "electricitynorthwest"
 
+
 class SPENClient(Client):
     name = "spenergynetworks"
+
 
 class NPGClient(Client):
     name = "northernpowergrid"

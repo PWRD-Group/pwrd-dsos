@@ -23,7 +23,7 @@ check-notebooks:
     - uv sync --group marimo
     - uv run marimo check notebooks
 
-run-ty:
+ty:
   stage: test
   tags:
     - bear-gitlab-runners
@@ -31,10 +31,18 @@ run-ty:
     - uv sync
     - uvx ty check src
 
-run-ruff:
+ruff-check:
   stage: test
   tags:
     - bear-gitlab-runners
   script:
     - uv sync
     - uvx ruff check src
+
+ruff-format:
+  stage: test
+  tags:
+    - bear-gitlab-runners
+  script:
+    - uv sync
+    - uvx ruff format --diff src
