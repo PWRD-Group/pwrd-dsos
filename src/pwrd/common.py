@@ -20,8 +20,8 @@ def xarray_to_xvec(xarr: xr.DataArray, areas: gpd.GeoDataFrame) -> xr.DataArray:
 
     name = areas.index.name
     # Need to convert Geometry array to a numpy object array. The .loc
-    # call hopefully ensures that the xarray is aligned properly with
-    # the geometry. This should mean the geometries are in the same
+    # call ensures that the xarray is aligned properly with
+    # the geometry. This means the geometries are in the same
     # order as the index of xarr.
     geometries = np.array(areas.loc[xarr[name]].geometry)
 
