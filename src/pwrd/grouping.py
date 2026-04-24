@@ -56,8 +56,8 @@ def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Ser
         raise ValueError(msg)
 
     return (
-        areas.sjoin(points, predicate="contains", how="left")
-        .groupby(index_name)["index_right"]
+        areas.sjoin(points, predicate="contains", how="left")["index_right"]
+        .groupby(index_name)
         .count()
         .rename("count")
     )
