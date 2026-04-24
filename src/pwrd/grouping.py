@@ -40,7 +40,14 @@ def line_length_in_areas(
     return total_line_length.reindex_like(areas).fillna(0)
 
 
-def points_in_areas(points, areas):
+def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Series:
+    """Count the number of points in given areas.
+
+    Returns
+    -------
+    A pandas.Series with the same index as areas and the number of
+    points in each area as values
+    """
 
     # Group by the index
     index_name = areas.index.name
