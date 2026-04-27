@@ -14,12 +14,11 @@ if TYPE_CHECKING:
     import xarray as xr
 
 
-@pd.api.extensions.register_dataframe_accessor("pwrd")
-class PwrdFaultsAccessor:
+class Mixin:
     """Pandas DataFrame accessor for working with fault/incident data."""
 
-    def __init__(self, df: pd.DataFrame) -> None:
-        self._df = df
+    # To satisfy the type checker
+    _df: gpd.GeoDataFrame
 
     def fault_counts(
         self,
