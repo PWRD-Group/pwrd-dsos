@@ -11,33 +11,34 @@ def line_length_in_areas(
     """Given line data and polygon data, compute aggregated statistic.
 
 
+    Notes
+    -----
+    It may be a bit surprising that this method is using a loop over
+    geometries. In testing it has been found that this is as
+    performant (if not more) for the sorts of problems we are
+    typically dealing with. However, this might not be the best
+    method if the number of polygons becomes very large.
+
     Returns
     -------
     A pandas.Series with the same index as areas and the length as
     values
     """
-    # how="intersection" is the default
-
-    lines_in_areas = lines.overlay(
-        areas.reset_index()
-        # ty gets confused about what happens after reset_index so
-        # explicitly set geometry
-        .set_geometry(areas.geometry.name)
-    )
-    # By default we'll convert lengths to km, but this might be CRS
-    # dependent. There will be a warning issued if we are calling
-    # length on a CRS with units of degrees
-    lines_in_areas["length"] = lines_in_areas.to_crs(crs).length / 1000.0
-
-    # Group by the index
     index_name = areas.index.name
     if index_name is None:
         msg = "areas must be supplied with a named index"
         raise ValueError(msg)
-    total_line_length = lines_in_areas.groupby(index_name)["length"].sum()
-    # Return total lengths, ensuring that all areas have an entry,
-    # setting areas without lines to 0
-    return total_line_length.reindex_like(areas).fillna(0)
+
+    # Ensure both in crs
+    lines = lines.to_crs(crs)
+    areas = areas.to_crs(crs)
+
+    return pd.Series(
+        {
+            key: lines.clip(poly).length.sum() / 1000.0
+            for key, poly in areas.geometry.items()
+        }
+    ).rename_axis(index_name)
 
 
 def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Series:
