@@ -83,11 +83,11 @@ class Mixin:
             # incidents
             .sjoin(areas, predicate="within", how="right")
             # Make a new column in the dataframe that is the hour the
-            # fault occured
+            # fault occurred
             .assign(
                 time=lambda df: df[start].dt.floor(freq).dt.tz_localize(None),
             )
-            # Group by GSP and hour the incident occured
+            # Group by GSP and hour the incident occurred
             # Keep any NA values (areas without faults)
             .groupby([name, "time"], dropna=False)
             # Find the size of each group (the number of faults / hour)
@@ -102,7 +102,7 @@ class Mixin:
             # Rename hour as valid time for consistency with weather data
             .rename(time="valid_time")
             # Fill any NA values with 0 (if they are NA then it means
-            # no incidents occured in that GSP in that hour)
+            # no incidents occurred in that GSP in that hour)
             .fillna(0)
         )
 

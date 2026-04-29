@@ -69,6 +69,8 @@ def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Ser
 
 
 class Mixin:
+    """Pandas DataFrame accessor for grouping data by area."""
+
     # To satisfy the type checker
     _df: gpd.GeoDataFrame
 
@@ -110,5 +112,6 @@ class Mixin:
         return xarray_to_xvec(out.to_xarray(), areas)
 
     def points_in_areas(self, areas):
+        """Count the number of points in given areas."""
         out = points_in_areas(self._df, areas)
         return xarray_to_xvec(out.to_xarray(), areas)

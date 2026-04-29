@@ -47,6 +47,8 @@ def from_area(xdata: XrLike, area: gpd.GeoDataFrame) -> XrLike:
 @xr.register_dataset_accessor("pwrd")
 @xr.register_dataarray_accessor("pwrd")
 class PwrdAccessor:
+    """xarray-like accessor for pwrd methods."""
+
     def __init__(self, da):
         self._da = da
 

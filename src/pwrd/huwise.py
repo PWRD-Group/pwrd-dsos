@@ -146,6 +146,7 @@ class Client(Mapping):
 
     @cached_property
     def catalogue(self) -> dict[str, Resource]:
+        """The available resources."""
         cat_list = self._api_call("/", limit=100, sleep=0.1)
         catalogue = {i["dataset_id"]: Resource(self, i) for i in cat_list}
         if len(catalogue) != len(cat_list):

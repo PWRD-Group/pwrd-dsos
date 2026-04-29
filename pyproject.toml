@@ -63,6 +63,8 @@ convention = "numpy"
 [tool.ruff.lint]
 extend-select = ["TD003", "D"]
 ignore = [
+   "D100",  # For now don't document modules, providing methods/functions are
+   "D104",  # No need for docstring on package
    "D105",  # Don't need docstrings on magic methods
+   "D401",  # Imperative mood (not sure it is always right)
 ]
-
