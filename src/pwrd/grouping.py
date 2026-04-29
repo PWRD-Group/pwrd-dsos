@@ -74,9 +74,34 @@ class Mixin:
     _df: gpd.GeoDataFrame
 
     def line_length_in_areas(self, areas, crs, *, groupby=None):
+        """Calculate line lengths in areas.
+
+        Given lines and areas, calculate the total line length in each
+        area.
+
+        Parameters
+        ----------
+        areas:
+            A geopandas GeoDataFrame of areas to perform the aggregation
+            with
+        crs:
+            The CRS to perform the aggregation. Important in order to
+            get the right units.
+        groupby:
+            A column name in areas to groupby after calculating line lengths.
+            It is generally faster to calculate line lengths with small areas
+            and then sum them to get the line lengths in large areas. For
+            example it may be faster to pass primary areas as the `areas`
+            argument and then `groupby="dno"` to get the line lengths per dno
+            rather than passing the DNOs as the `areas` argument.
+
+        Returns
+        -------
+        An `xarray.DataArray` in the format that `xvec` uses i.e. has a
+        `geometry` dimension.
+        """
         out = line_length_in_areas(self._df, areas, crs)
 
-        # TODO: Document and test groupby!
         if groupby:
             # Perform a groupby operation on the computed lengths
             out = areas.join(out).groupby(groupby)["length"].sum()
