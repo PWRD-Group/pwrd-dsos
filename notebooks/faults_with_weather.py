@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.4"
+__generated_with = "0.22.4"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -73,7 +73,7 @@ def _(earth_ds):
             .sel(valid_time=slice("2021", "2024"))
     )
     uk_ds
-    return incidents, uk_ds, ukpn_gsps
+    return client, incidents, uk_ds, ukpn_gsps, ukpn_primary
 
 
 @app.cell(hide_code=True)
@@ -340,6 +340,226 @@ def _(binning, dno_per_gsp, tester):
 def _():
     mo.md(r"""
     We can see that there is no relation in London, but we see similar trends in the East and South East England DNOs.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ### Adding powerline data
+
+    In the [resilience paper](https://rmets.onlinelibrary.wiley.com/doi/epdf/10.1002/met.2127), the faults per hour are normalised by overhead line length in each area. We can compute the length of overhead lines by reading in the powerline data and using the `line_length_in_areas` method of the `pwrd` accessor (see the `power_lines.py` notebook for more information about this).
+    """)
+    return
+
+
+@app.cell
+def _(client):
+    all_overhead_lines = []
+    for name, resource in client.items():
+        if "overhead" not in name:
+            continue
+        all_overhead_lines.append(gpd.read_parquet(resource.file("parquet")))
+        # Check that the length of the loaded parquet file is the same as we expect from the resource
+        assert len(resource) == len(all_overhead_lines[-1])
+    all_overhead_lines = pd.concat(all_overhead_lines).set_geometry("geo_shape")
+    return (all_overhead_lines,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    Counter intuitively it is faster to compute the line lengths on smaller areas and then aggregate those results. There is a `groupby` keyword on the `line_length_in_areas` method to do this i.e.
+
+    ```python
+    # Don't do
+    gsp_overhead_lines = all_overhead_lines.pwrd.line_length_in_areas(ukpn_gsps, crs=27700)
+    # Instead do
+    gsp_overhead_lines = all_overhead_lines.pwrd.line_length_in_areas(ukpn_primaries, crs=27700, groupby="grid_supply_point")
+    ```
+    The two methods should return the same results, but the second will be faster.
+    """)
+    return
+
+
+@app.cell
+def _(all_overhead_lines, ukpn_primary):
+    gsp_overhead_lengths = all_overhead_lines.pwrd.line_length_in_areas(
+        ukpn_primary.set_index("primary"), crs=27700, groupby="grid_supply_point"
+    )
+    return (gsp_overhead_lengths,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    This can then be merged with our existing data. We'll keep the DNO coordinate too.
+    """)
+    return
+
+
+@app.cell
+def _(dno_per_gsp, gsp_overhead_lengths, tester):
+    data_with_lengths = xr.merge([tester.assign_coords(dno=dno_per_gsp), gsp_overhead_lengths], compat="equals")
+    return (data_with_lengths,)
+
+
+@app.cell
+def _(data_with_lengths):
+    data_with_lengths
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    We can see that the `xarray.Dataset` now contains a data variable called length. Let's revisit our plotting function to see what data looks like after normalising by length.
+    """)
+    return
+
+
+@app.cell
+def _(binning, data_with_lengths):
+    def length_plot_helper(name, df, ax, color, statistic="mean", plot_scatter=True):
+
+        def lighten(color, amount=0.5):
+            """Lighens the input colour"""
+            import matplotlib.colors as mc
+            c = mc.to_rgb(color)
+            return tuple(1 - (1 - x) * (1 - amount) for x in c)
+
+        df["faults_per_1000km"] = 1000 * df["faults"] / df["length"]
+
+        # If length is 0, then we can get infinite values for
+        # faults_per_1000km, which isn't really what we want. We can set those values to NaN
+        df["faults_per_1000km"] = df["faults_per_1000km"].where(np.isfinite)
+
+        if plot_scatter:
+            df.plot.scatter(x="wind_mag", y="faults_per_1000km", s=4, facecolor=lighten(color), edgecolor="none", ax=ax)
+        stat = getattr(df.groupby_bins("wind_mag", bins=binning), statistic)()
+        ax.plot(
+            stat["wind_mag_bins"].data.mid,
+            stat["faults_per_1000km"],
+            marker="o", color=color, markeredgecolor="white", label=name
+        )
+
+    # Colours from https://coolors.co/palettes/popular/3%20colors
+    # (Cherry Ocean Sunset)
+    _colors = iter(["#edae49", "#d1495b", "#00798c"])
+
+    _fig, _ax = plt.subplots()
+    for _group in data_with_lengths.groupby("dno"):
+        length_plot_helper(*_group, ax=_ax, color=next(_colors))
+
+    _ax.set(title="", ylabel="New faults per hour\nper 1000km of overhead line")
+    _ax.legend()
+    _ax
+    return (length_plot_helper,)
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    This doesn't look as nice as what we had before! There are a few things going on.
+
+    + The DNO lines probably aren't quite what we want here (and perhaps not in the previous plot either). We are first computing the faults / hour / 1000km in each GSP, and then getting the mean of those values (so the lines aren't sum(faults) / sum(lines) for the entire DNO).
+    + The banding structure we had previously (due to new faults being a discrete value) is made worse after normalising by line length. If a GSP has almost no overhead lines dividing by a small number makes the resulting value very large. It also gives us large outliers. Let's just not plot each GSP individually.
+    + Due to the outliers, using the `median` instead of the mean might make a nicer plot.
+    """)
+    return
+
+
+@app.cell
+def _(data_with_lengths, length_plot_helper):
+    # Colours from https://coolors.co/palettes/popular/3%20colors
+    # (Cherry Ocean Sunset)
+    _colors = iter(["#edae49", "#d1495b", "#00798c"])
+
+    _fig, _ax = plt.subplots()
+    for _group in data_with_lengths.groupby("dno"):
+        length_plot_helper(*_group, ax=_ax, color=next(_colors), statistic="median", plot_scatter=False)
+
+    _ax.set(
+        title="",
+        xlabel="10 metre wind magnitude [ms$^{-1}$]",
+        ylabel="New faults per hour\nper 1000km of overhead line",
+    )
+    _ax.legend()
+    _ax
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    But this probably still isn't what we want, due to the way we are computing a statistic across GSPs! The simplest thing to do would be to repeat the whole analysis starting with DNOs rather than GSPs, and then we know we have the right statistics. Let's do that!
+
+    ## Full analysis starting with DNOS
+    """)
+    return
+
+
+@app.cell
+def _(all_overhead_lines, incidents, ukpn_primary, wind_ds):
+    # Dissolve the DNOs from primaries
+    ukpn_dnos = ukpn_primary.dissolve("dno")
+    # wind data
+    mean_wind_dno = wind_ds.xvec.zonal_stats(
+        ukpn_dnos.geometry,
+        x_coords="longitude",
+        y_coords="latitude",
+        method="iterate",  # polygons are small compared to pixels
+        all_touched=True,
+        stats="mean",
+        n_jobs=-1,
+    )
+    # fault data
+    faults_dno = incidents.pwrd.fault_counts(ukpn_dnos, start="start_date_time", end="end_date_time", reference="incident_reference")
+    # overhead data
+    overhead_lengths_dno = all_overhead_lines.pwrd.line_length_in_areas(ukpn_primary.set_index("primary"), crs=27700, groupby="dno")
+    return faults_dno, mean_wind_dno, overhead_lengths_dno
+
+
+@app.cell
+def _(faults_dno, mean_wind_dno, overhead_lengths_dno):
+    all_dno_data = xr.merge([mean_wind_dno, faults_dno, overhead_lengths_dno], join="outer", compat="equals")
+    return (all_dno_data,)
+
+
+@app.cell
+def _(all_dno_data):
+    all_dno_data
+    return
+
+
+@app.cell
+def _(all_dno_data, length_plot_helper):
+    # Colours from https://coolors.co/palettes/popular/3%20colors
+    # (Ocean Sunset)
+    _colors = iter(["#edae49",  "#00798c"])
+
+    _fig, _ax = plt.subplots()
+    for _group in all_dno_data.groupby("dno"):
+        if _group[0] == "LPN":
+            continue
+        length_plot_helper(*_group, ax=_ax, color=next(_colors))
+
+    _ax.set(
+        title="",
+        xlabel="10 metre wind magnitude [ms$^{-1}$]",
+        ylabel="New faults per hour\nper 1000km of overhead line",
+    )
+    _ax.legend()
+    _ax.set(ylim=(0, 10))
+    _ax
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    This looks like what we might expect. Note that we've dropped the London data here because there are so few overhead powerlines it doesn't make a huge amount of sense.
     """)
     return
 
