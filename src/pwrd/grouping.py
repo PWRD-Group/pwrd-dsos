@@ -6,10 +6,11 @@ from pwrd.common import xarray_to_xvec
 
 
 def line_length_in_areas(
-    lines: gpd.GeoDataFrame, areas: gpd.GeoDataFrame, crs: str | int
+    lines: gpd.GeoDataFrame,
+    areas: gpd.GeoDataFrame,
+    crs: str | int,
 ) -> pd.Series:
     """Given line data and polygon data, compute aggregated statistic.
-
 
     Notes
     -----
@@ -33,12 +34,16 @@ def line_length_in_areas(
     lines = lines.to_crs(crs)
     areas = areas.to_crs(crs)
 
-    return pd.Series(
-        {
-            key: lines.clip(poly).length.sum() / 1000.0
-            for key, poly in areas.geometry.items()
-        }
-    ).rename_axis(index_name)
+    return (
+        pd.Series(
+            {
+                key: lines.clip(poly).length.sum() / 1000.0
+                for key, poly in areas.geometry.items()
+            }
+        )
+        .rename_axis(index_name)
+        .rename("length")
+    )
 
 
 def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Series:
@@ -68,8 +73,16 @@ class Mixin:
     # To satisfy the type checker
     _df: gpd.GeoDataFrame
 
-    def line_length_in_areas(self, areas, crs):
+    def line_length_in_areas(self, areas, crs, *, groupby=None):
         out = line_length_in_areas(self._df, areas, crs)
+
+        # TODO: Document and test groupby!
+        if groupby:
+            # Perform a groupby operation on the computed lengths
+            out = areas.join(out).groupby(groupby)["length"].sum()
+            # Dissolve the areas by the groupby argument
+            areas = areas.dissolve(groupby)
+
         return xarray_to_xvec(out.to_xarray(), areas)
 
     def points_in_areas(self, areas):
