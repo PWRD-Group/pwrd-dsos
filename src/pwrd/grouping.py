@@ -54,7 +54,6 @@ def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Ser
     A pandas.Series with the same index as areas and the number of
     points in each area as values
     """
-
     # Group by the index
     index_name = areas.index.name
     if index_name is None:

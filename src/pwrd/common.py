@@ -17,7 +17,6 @@ def xarray_to_xvec(xarr: xr.DataArray, areas: gpd.GeoDataFrame) -> xr.DataArray:
     An xarray.DataArray with a geometry dimension that matches a
     coordinate which is the index of the input `areas` GeoDataFrame.
     """
-
     name = areas.index.name
     # Need to convert Geometry array to a numpy object array. The .loc
     # call ensures that the xarray is aligned properly with

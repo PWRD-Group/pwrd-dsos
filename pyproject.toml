@@ -61,4 +61,5 @@ pwrd = { workspace = true, editable = true }
 convention = "numpy"
 
 [tool.ruff.lint]
-extend-select = ["TD003"]
+extend-select = ["TD003", "D"]
+
