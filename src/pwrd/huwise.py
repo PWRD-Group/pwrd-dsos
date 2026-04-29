@@ -171,16 +171,37 @@ class Client(Mapping):
 
 
 class UKPNClient(Client):
+    """Client for UK Power Networks API.
+
+    Covers East England, London, and South East England.
+    """
+
     name = "ukpowernetworks"
 
 
 class ENWClient(Client):
+    """Client for Electricity North West England API.
+
+    Covers North West England.
+    """
+
     name = "electricitynorthwest"
 
 
 class SPENClient(Client):
+    """Client for Scottish Power Energy Networks API.
+
+    Covers South and Central Scotland, North Wales, Merseyside and
+    Cheshire.
+    """
+
     name = "spenergynetworks"
 
 
 class NPGClient(Client):
+    """Client for Northern Power Grid API.
+
+    Covers Yorkshire and North East England.
+    """
+
     name = "northernpowergrid"
