@@ -132,7 +132,7 @@ def _(all_overhead_lines, ukpn_primary_areas):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    It takes longer to run (about 45 seconds on my machine) but gives us the powerline length for all overhead powerlines in the UKPN area.
+    It takes longer to run (about 40 seconds on my machine) but gives us the powerline length for all overhead powerlines in the UKPN area.
     """)
     return
 
