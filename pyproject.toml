@@ -53,3 +53,6 @@ pwrd = { workspace = true, editable = true }
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.ruff.lint]
+extend-select = ["TD003"]

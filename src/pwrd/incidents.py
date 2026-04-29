@@ -61,7 +61,6 @@ class Mixin:
         for valid frequency aliases.
 
         """
-        # TODO: Do we want to know the number of ongoing faults at a given time?
         name = areas.index.name
 
         # A daterange spanning all times from the start of the
