@@ -53,7 +53,7 @@ class Resource:
         return f"<Resource name='{self.name}'>"
 
     def __len__(self) -> int:
-        """The record count"""
+        """The record count."""
         return int(self.info["metas"]["default"]["records_count"])
 
     def _export_paths(self) -> dict[str, str]:

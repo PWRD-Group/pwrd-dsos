@@ -1,4 +1,4 @@
-"""ERA5 data stores from <https://earthdatahub.destine.eu>"""
+"""ERA5 data stores from <https://earthdatahub.destine.eu>."""
 
 from zarr.storage import FsspecStore
 

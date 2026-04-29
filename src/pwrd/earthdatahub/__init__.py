@@ -51,7 +51,7 @@ class PwrdAccessor:
         self._da = da
 
     def era5_from_area_bounds(self, area):
-        """Select elements of an xarray Dataset or DataArray from the total bounds of an area"""
+        """Select elements of an xarray Dataset or DataArray from the total bounds of an area."""
         return from_area(self._da, area)
 
     def convert_longitude(self):

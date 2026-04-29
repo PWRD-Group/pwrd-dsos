@@ -62,4 +62,7 @@ convention = "numpy"
 
 [tool.ruff.lint]
 extend-select = ["TD003", "D"]
+ignore = [
+   "D105",  # Don't need docstrings on magic methods
+]
 
