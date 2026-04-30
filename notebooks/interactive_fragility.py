@@ -39,28 +39,72 @@ def _():
     iis = client["ukpn-iis"]
     incidents = gpd.read_parquet(iis.file("parquet"))
 
-    # The GSP dataset has some duplicates and overlaps which make it a bit tricky to work with.
-    # It seems that using the primarys and disolving them down seems to work well
     ukpn_primary = gpd.read_parquet(client["ukpn_primary_postcode_area"].file("parquet")).set_geometry("geo_shape")
-    ukpn_gsps = ukpn_primary.dissolve("grid_supply_point")
+    return client, earth_ds, incidents, ukpn_primary
 
+
+@app.cell
+def _(earth_ds, ukpn_primary):
     # We select the uk_ds (badly named, as it is just the UKPN area) from the ERA5 data
     uk_ds = (
         earth_ds
-            .pwrd.era5_from_area_bounds(ukpn_gsps)
+            .pwrd.era5_from_area_bounds(ukpn_primary)
             # ERA5 has longitudes from 0 -> 360, convert to -180 -> 180
             .pwrd.convert_longitude()
             # Select just the years from 2021 to 2024
             .sel(valid_time=slice("2021", "2024"))
     )
+    return (uk_ds,)
 
-    wind_ds_cloud = uk_ds[["v10", "u10"]]
-    wind_ds = wind_ds_cloud.compute()
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ## Select ERA5 variables
+
+    Select which ERA5 variables are downloaded and made available. Note that the zonal statistics are computed using the mean and this might not make sense for every variable.
+    """)
+    return
+
+
+@app.cell
+def _(uk_ds):
+    wind_variables = {"v10", "u10"}
+
+    all_varaibles = sorted(set(uk_ds.data_vars) - wind_variables)
+
+    # We are going to limit max selections to 5 but this is
+    # somewhat arbitray and just to avoid accidentally downloading too much data
+    _label  = "Select ERA5 variables (v10 and u10 are always included):"
+
+    era5_varaible_selector = mo.ui.multiselect(options=all_varaibles, max_selections=5, label=_label)
+    era5_varaible_selector
+    return era5_varaible_selector, wind_variables
+
+
+@app.cell
+def _(era5_varaible_selector, wind_variables):
+    selected = era5_varaible_selector.value + list(wind_variables)
+    return (selected,)
+
+
+@app.cell
+def _(selected, uk_ds):
+    # Wind are always included because we do some calculations with them below.
+    # This could definitely be fixed in the longer term but for now we'll leave as is.
+
+
+    weather_ds_cloud = uk_ds[selected]
+    weather_ds = weather_ds_cloud.compute()
     # Other attrs should potentially be defined,
     # but these are the ones used for plotting
-    wind_ds["wind_mag"] = np.hypot(wind_ds.u10, wind_ds.v10).assign_attrs(
+    weather_ds["wind_mag"] = np.hypot(weather_ds.u10, weather_ds.v10).assign_attrs(
         standard_name="Wind magnitude", long_name="10 metre wind magnitude", units=r"ms$^{-1}$")
+    return (weather_ds,)
 
+
+@app.cell
+def _(client):
     all_overhead_lines = []
     for name, resource in client.items():
         if "overhead" not in name:
@@ -69,15 +113,15 @@ def _():
         # Check that the length of the loaded parquet file is the same as we expect from the resource
         assert len(resource) == len(all_overhead_lines[-1])
     all_overhead_lines = pd.concat(all_overhead_lines).set_geometry("geo_shape")
-    return all_overhead_lines, incidents, ukpn_primary, wind_ds
+    return (all_overhead_lines,)
 
 
 @app.cell
-def _(all_overhead_lines, incidents, ukpn_primary, wind_ds):
+def _(ukpn_primary, weather_ds):
     # Dissolve the DNOs from primaries
     ukpn_dnos = ukpn_primary.dissolve("dno")
     # wind data
-    mean_wind_dno = wind_ds.xvec.zonal_stats(
+    mean_weather_dno = weather_ds.xvec.zonal_stats(
         ukpn_dnos.geometry,
         x_coords="longitude",
         y_coords="latitude",
@@ -86,15 +130,25 @@ def _(all_overhead_lines, incidents, ukpn_primary, wind_ds):
         stats="mean",
         n_jobs=-1,
     )
+    return mean_weather_dno, ukpn_dnos
+
+
+@app.cell
+def _(incidents, ukpn_dnos):
     # fault data
     faults_dno = incidents.pwrd.fault_counts(ukpn_dnos, start="start_date_time", end="end_date_time", reference="incident_reference")
+    return
+
+
+@app.cell
+def _(all_overhead_lines, ukpn_primary):
     # overhead data
     overhead_lengths_dno = all_overhead_lines.pwrd.line_length_in_areas(ukpn_primary.set_index("primary"), crs=27700, groupby="dno")
-    return mean_wind_dno, overhead_lengths_dno, ukpn_dnos
+    return (overhead_lengths_dno,)
 
 
 @app.function
-def length_plot_helper(name, df, ax, color, statistic="mean", plot_scatter=True):
+def length_plot_helper(name, df, ax, color, variable="wind_mag", statistic="mean", binning=np.arange(0, 25, 2.5), plot_scatter=True):
 
     def lighten(color, amount=0.5):
         """Lighens the input colour"""
@@ -107,29 +161,39 @@ def length_plot_helper(name, df, ax, color, statistic="mean", plot_scatter=True)
     # If length is 0, then we can get infinite values for
     # faults_per_1000km, which isn't really what we want. We can set those values to NaN
     df["faults_per_1000km"] = df["faults_per_1000km"].where(np.isfinite)
-    binning = np.arange(0, 25, 2.5)
+
+    range = (df[variable].min().item(), df[variable].max().item())
 
     if plot_scatter:
-        df.plot.scatter(x="wind_mag", y="faults_per_1000km", s=4, facecolor=lighten(color), edgecolor="none", ax=ax)
-    stat = getattr(df.groupby_bins("wind_mag", bins=binning), statistic)()
+        df.plot.scatter(x=variable, y="faults_per_1000km", s=4, facecolor=lighten(color), edgecolor="none", ax=ax)
+    stat = getattr(df.groupby_bins(variable, bins=binning), statistic)()
     ax.plot(
-        stat["wind_mag_bins"].data.mid,
+        stat[f"{variable}_bins"].data.mid,
         stat["faults_per_1000km"],
         marker="o", color=color, markeredgecolor="white", label=name
     )
 
 
 @app.cell
-def _(incidents, mean_wind_dno):
-    dno_selection = mo.ui.multiselect(mean_wind_dno.dno.values, label="DNOs:", value=["LPN", "EPN", "SPN"])
+def _(incidents, mean_weather_dno):
+    dno_selection = mo.ui.multiselect(mean_weather_dno.dno.values, label="DNOs:", value=["LPN", "EPN", "SPN"])
     cause_selection = mo.ui.multiselect(sorted(list(incidents["cause_code"].unique())), label="Cause codes:", value=["06"])
+    variable_selection = mo.ui.dropdown(options=mean_weather_dno.data_vars, value="wind_mag", allow_select_none=False)
     range_slider = mo.ui.range_slider(start=-1, stop=60, value=[-1, 20], label="Y-axis limits:")
-    return cause_selection, dno_selection, range_slider
+    return cause_selection, dno_selection, range_slider, variable_selection
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ## Choose variable to analyse
+    """)
+    return
 
 
 @app.cell
-def _(cause_selection, dno_selection, range_slider):
-    mo.hstack([dno_selection, cause_selection, range_slider], justify="start")
+def _(cause_selection, dno_selection, range_slider, variable_selection):
+    mo.hstack([variable_selection, dno_selection, cause_selection, range_slider], justify="start")
     return
 
 
@@ -138,10 +202,11 @@ def _(
     cause_selection,
     dno_selection,
     incidents,
-    mean_wind_dno,
+    mean_weather_dno,
     overhead_lengths_dno,
     range_slider,
     ukpn_dnos,
+    variable_selection,
 ):
     # Colours from https://coolors.co/palettes/popular/3%20colors
     # (Ocean Sunset)
@@ -151,17 +216,34 @@ def _(
     selected_faults = incidents[inc_sel].pwrd.fault_counts(
         ukpn_dnos, start="start_date_time", end="end_date_time", reference="incident_reference"
     )
-    tester = xr.merge([mean_wind_dno, selected_faults, overhead_lengths_dno], join="inner", compat="equals")
+    tester = xr.merge([mean_weather_dno, selected_faults, overhead_lengths_dno], join="inner", compat="equals")
+
+    variable = variable_selection.value
+
+    _min = tester[variable].min().item()
+    _max = tester[variable].max().item()
 
     _fig, _ax = plt.subplots()
-    for _group in tester.groupby("dno"):
-        if _group[0] not in dno_selection.value:
+    for _name, df in tester.groupby("dno"):
+        if _name not in dno_selection.value:
             continue
-        length_plot_helper(*_group, ax=_ax, color=next(_colors))
+        length_plot_helper(
+            _name, df,
+            ax=_ax,
+            color=next(_colors),
+            variable=variable,
+            binning=np.linspace(_min, _max, 10)
+        )
+
+
+    xname = tester[variable].attrs.get("long_name")
+    xunits = tester[variable].attrs.get("units")
+
+    xlabel = f"{xname} [{xunits}]" if xunits is not None else xname
 
     _ax.set(
         title="",
-        xlabel="10 metre wind magnitude [ms$^{-1}$]",
+        xlabel=xlabel,
         ylabel="New faults per hour\nper 1000km of overhead line",
     )
     _ax.legend()
