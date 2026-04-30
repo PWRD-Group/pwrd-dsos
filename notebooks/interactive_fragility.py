@@ -95,7 +95,8 @@ def _(selected, uk_ds):
 
 
     weather_ds_cloud = uk_ds[selected]
-    weather_ds = weather_ds_cloud.compute()
+    with mo.status.spinner(title="Getting ERA5 data"):
+        weather_ds = weather_ds_cloud.compute()
     # Other attrs should potentially be defined,
     # but these are the ones used for plotting
     weather_ds["wind_mag"] = np.hypot(weather_ds.u10, weather_ds.v10).assign_attrs(
@@ -116,20 +117,29 @@ def _(client):
     return (all_overhead_lines,)
 
 
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    ## Choose variable to analyse
+    """)
+    return
+
+
 @app.cell
 def _(ukpn_primary, weather_ds):
     # Dissolve the DNOs from primaries
     ukpn_dnos = ukpn_primary.dissolve("dno")
     # wind data
-    mean_weather_dno = weather_ds.xvec.zonal_stats(
-        ukpn_dnos.geometry,
-        x_coords="longitude",
-        y_coords="latitude",
-        method="iterate",  # polygons are small compared to pixels
-        all_touched=True,
-        stats="mean",
-        n_jobs=-1,
-    )
+    with mo.status.spinner(title="Computing zonal statistics"):
+        mean_weather_dno = weather_ds.xvec.zonal_stats(
+            ukpn_dnos.geometry,
+            x_coords="longitude",
+            y_coords="latitude",
+            method="iterate",  # polygons are small compared to pixels
+            all_touched=True,
+            stats="mean",
+            n_jobs=-1,
+        )
     return mean_weather_dno, ukpn_dnos
 
 
@@ -143,7 +153,8 @@ def _(incidents, ukpn_dnos):
 @app.cell
 def _(all_overhead_lines, ukpn_primary):
     # overhead data
-    overhead_lengths_dno = all_overhead_lines.pwrd.line_length_in_areas(ukpn_primary.set_index("primary"), crs=27700, groupby="dno")
+    with mo.status.spinner(title="Computing lines in areas"):
+        overhead_lengths_dno = all_overhead_lines.pwrd.line_length_in_areas(ukpn_primary.set_index("primary"), crs=27700, groupby="dno")
     return (overhead_lengths_dno,)
 
 
@@ -181,14 +192,6 @@ def _(incidents, mean_weather_dno):
     variable_selection = mo.ui.dropdown(options=mean_weather_dno.data_vars, value="wind_mag", allow_select_none=False)
     range_slider = mo.ui.range_slider(start=-1, stop=60, value=[-1, 20], label="Y-axis limits:")
     return cause_selection, dno_selection, range_slider, variable_selection
-
-
-@app.cell(hide_code=True)
-def _():
-    mo.md(r"""
-    ## Choose variable to analyse
-    """)
-    return
 
 
 @app.cell
