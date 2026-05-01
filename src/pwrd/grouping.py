@@ -10,7 +10,7 @@ def line_length_in_areas(
     areas: gpd.GeoDataFrame,
     crs: str | int,
 ) -> pd.Series:
-    """Given line data and polygon data, compute aggregated statistic.
+    """Calculate the total line length in each area.
 
     Notes
     -----
