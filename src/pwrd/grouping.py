@@ -6,38 +6,44 @@ from pwrd.common import xarray_to_xvec
 
 
 def line_length_in_areas(
-    lines: gpd.GeoDataFrame, areas: gpd.GeoDataFrame, crs: str | int
+    lines: gpd.GeoDataFrame,
+    areas: gpd.GeoDataFrame,
+    crs: str | int,
 ) -> pd.Series:
-    """Given line data and polygon data, compute aggregated statistic.
+    """Calculate the total line length in each area.
 
+    Notes
+    -----
+    It may be a bit surprising that this method is using a loop over
+    geometries. In testing it has been found that this is as
+    performant (if not more) for the sorts of problems we are
+    typically dealing with. However, this might not be the best
+    method if the number of polygons becomes very large.
 
     Returns
     -------
     A pandas.Series with the same index as areas and the length as
     values
     """
-    # how="intersection" is the default
-
-    lines_in_areas = lines.overlay(
-        areas.reset_index()
-        # ty gets confused about what happens after reset_index so
-        # explicitly set geometry
-        .set_geometry(areas.geometry.name)
-    )
-    # By default we'll convert lengths to km, but this might be CRS
-    # dependent. There will be a warning issued if we are calling
-    # length on a CRS with units of degrees
-    lines_in_areas["length"] = lines_in_areas.to_crs(crs).length / 1000.0
-
-    # Group by the index
     index_name = areas.index.name
     if index_name is None:
         msg = "areas must be supplied with a named index"
         raise ValueError(msg)
-    total_line_length = lines_in_areas.groupby(index_name)["length"].sum()
-    # Return total lengths, ensuring that all areas have an entry,
-    # setting areas without lines to 0
-    return total_line_length.reindex_like(areas).fillna(0)
+
+    # Ensure both in crs
+    lines = lines.to_crs(crs)
+    areas = areas.to_crs(crs)
+
+    return (
+        pd.Series(
+            {
+                key: lines.clip(poly).length.sum() / 1000.0
+                for key, poly in areas.geometry.items()
+            }
+        )
+        .rename_axis(index_name)
+        .rename("length")
+    )
 
 
 def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Series:
@@ -67,8 +73,41 @@ class Mixin:
     # To satisfy the type checker
     _df: gpd.GeoDataFrame
 
-    def line_length_in_areas(self, areas, crs):
+    def line_length_in_areas(self, areas, crs, *, groupby=None):
+        """Calculate line lengths in areas.
+
+        Given lines and areas, calculate the total line length in each
+        area.
+
+        Parameters
+        ----------
+        areas:
+            A geopandas GeoDataFrame of areas to perform the aggregation
+            with
+        crs:
+            The CRS to perform the aggregation. Important in order to
+            get the right units.
+        groupby:
+            A column name in areas to groupby after calculating line lengths.
+            It is generally faster to calculate line lengths with small areas
+            and then sum them to get the line lengths in large areas. For
+            example it may be faster to pass primary areas as the `areas`
+            argument and then `groupby="dno"` to get the line lengths per dno
+            rather than passing the DNOs as the `areas` argument.
+
+        Returns
+        -------
+        An `xarray.DataArray` in the format that `xvec` uses i.e. has a
+        `geometry` dimension.
+        """
         out = line_length_in_areas(self._df, areas, crs)
+
+        if groupby:
+            # Perform a groupby operation on the computed lengths
+            out = areas.join(out).groupby(groupby)["length"].sum()
+            # Dissolve the areas by the groupby argument
+            areas = areas.dissolve(groupby)
+
         return xarray_to_xvec(out.to_xarray(), areas)
 
     def points_in_areas(self, areas):
