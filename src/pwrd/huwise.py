@@ -69,6 +69,7 @@ class Resource:
         downloaded.
         """
         # TODO: Add some check for if the file has been modified
+        # https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/-/work_items/1
         cache_path = self.client.cache_path / f"{self.name}.{ext}"
         if cache_path.exists():
             return cache_path
