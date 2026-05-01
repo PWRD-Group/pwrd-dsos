@@ -43,6 +43,12 @@ marimo = [
     "xvec>=0.5.2",
 ]
 
+[tool.uv]
+# There seems to have been an increased number of compromised packages
+# recently. By limiting packages to older than 7 days, we can
+# hopefully mitigate this slightly (although no method is perfect)
+exclude-newer = "7 days"
+
 [tool.uv.workspace]
 members = [
     ".",
