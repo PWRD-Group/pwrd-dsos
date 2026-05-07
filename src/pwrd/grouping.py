@@ -54,7 +54,6 @@ def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Ser
     A pandas.Series with the same index as areas and the number of
     points in each area as values
     """
-
     # Group by the index
     index_name = areas.index.name
     if index_name is None:
@@ -70,6 +69,8 @@ def points_in_areas(points: gpd.GeoDataFrame, areas: gpd.GeoDataFrame) -> pd.Ser
 
 
 class Mixin:
+    """Pandas DataFrame accessor for grouping data by area."""
+
     # To satisfy the type checker
     _df: gpd.GeoDataFrame
 
@@ -111,5 +112,6 @@ class Mixin:
         return xarray_to_xvec(out.to_xarray(), areas)
 
     def points_in_areas(self, areas):
+        """Count the number of points in given areas."""
         out = points_in_areas(self._df, areas)
         return xarray_to_xvec(out.to_xarray(), areas)
