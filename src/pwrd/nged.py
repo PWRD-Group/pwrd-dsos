@@ -9,25 +9,20 @@ from urllib.parse import quote, urlencode
 
 import httpx
 
-from pwrd.huwise import _get_api_key
+from pwrd.huwise import _get_api_key, Resource as HuwiseResource
 
 logger = logging.getLogger(__name__)
 
 
-class Resource:
-    """A OpenData resource."""
-
-    def __init__(self, client: "Client", info: dict) -> None:
-        self.client = client
-        self.info = info
+class Resource(HuwiseResource):
+    """An NGED resource."""
 
     @property
     def name(self) -> str:
         """The dataset identifier."""
         return self.info["resource"]["name"]
 
-    def __repr__(self) -> str:
-        return f"<Resource name='{self.name}'>"
+    # TODO: We need to do something about __len__
 
     def _export_paths(self) -> dict[str, str]:
         """A dictionary of allowed file types to export (download)."""
