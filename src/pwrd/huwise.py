@@ -2,7 +2,7 @@
 
 import logging
 import time
-from collections.abc import Mapping
+from collections.abc import Mapping, Iterator
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
@@ -115,7 +115,7 @@ class Client(Mapping):
         limit: int = 20,
         sleep: float = 2.0,
         **kwargs,
-    ) -> list[dict]:
+    ) -> Iterator[dict]:
         """Make a generic API call handling pagination."""
         params = kwargs | {"limit": limit, "offset": 0}
         while True:
