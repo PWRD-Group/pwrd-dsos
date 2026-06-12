@@ -19,7 +19,9 @@ class Resource(HuwiseResource):
     @property
     def name(self) -> str:
         """The dataset identifier."""
-        return self.info["resource"]["name"]
+        # There is self.info["resource"]["name"] but using the URL
+        # stem works a bit better for compatibility
+        return str(Path(self.info["resource"]["url"]).stem)
 
     # TODO: We need to do something about __len__
 
@@ -27,42 +29,6 @@ class Resource(HuwiseResource):
         """A dictionary of allowed file types to export (download)."""
         info = self.info["resource"]
         return {info["format"].lower(): info["url"]}
-
-    def file(self, ext: str | None = None) -> Path:
-        """Get the local path to the file.
-
-        If the file doesn't exist locally in the cache, then it is
-        downloaded.
-        """
-        # If ext is not supplied then get it from the info
-        ext = ext or self.info["resource"]["format"].lower()
-
-        # First we should check if this exists
-        href = self._export_paths().get(ext)
-        if not href:
-            msg = f"{self.name} can not be exported as {ext}"
-            raise ValueError(msg)
-
-        name = Path(href).name
-
-        # TODO: Add some check for if the file has been modified
-        # https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/-/work_items/1
-        cache_path = self.client.cache_path / name
-        if cache_path.exists():
-            return cache_path
-
-        logger.info("%s doesn't exist in cache... downloading", cache_path)
-        # Make the cache directory if it doesn't exist
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
-
-        with (
-            cache_path.open("wb") as f,
-            self.client.client.stream("GET", href) as r,
-        ):
-            for data in r.iter_raw():
-                f.write(data)
-
-        return cache_path
 
 
 class Client(HuwiseClient):
