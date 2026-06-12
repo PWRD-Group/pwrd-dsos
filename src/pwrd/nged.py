@@ -1,7 +1,6 @@
 """A client for downloading datasets from a Huwise OpenData portal."""
 
 import logging
-import time
 from functools import cached_property
 from pathlib import Path
 
@@ -34,6 +33,7 @@ class Client(HuwiseClient):
     """A client class for querying the National Grid connecteddata API."""
 
     name = "nged"
+    result_field = "result"
 
     def __init__(self) -> None:
         base_url = "https://connecteddata.nationalgrid.co.uk/api/3/action/"
@@ -46,18 +46,10 @@ class Client(HuwiseClient):
         """The available resources."""
         catalogue = {}
         endpoint = "current_package_list_with_resources"
-        params = {"limit": 10, "offset": 0}
-        # We will do this until we don't get as many results as we ask for
-        while True:
-            result = self.client.get(endpoint, params=params).json()
 
-            if not result["success"]:
-                msg = "Failed to get NGED package list"
-                raise RuntimeError(msg)
-
-            for group in result["result"]:
+        for results in self._api_call(endpoint, sleep=0.1):
+            for group in results:
                 group_data = {i: j for i, j in group.items() if i != "resources"}
-
                 for resource in group["resources"]:
                     info = {
                         "resource": resource,
@@ -65,12 +57,5 @@ class Client(HuwiseClient):
                     }
                     name = f"{group['name']}/{resource['name']}"
                     catalogue[name] = Resource(self, info)
-
-            if len(result["result"]) != params["limit"]:
-                break
-            else:
-                params["offset"] += params["limit"]
-                # Small sleep to try and not abuse the API
-                time.sleep(0.1)
 
         return catalogue
