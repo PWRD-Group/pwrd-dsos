@@ -2,14 +2,13 @@
 
 import logging
 import time
-from collections.abc import Mapping
 from functools import cached_property
 from pathlib import Path
 from urllib.parse import quote, urlencode
 
 import httpx
 
-from pwrd.huwise import _get_api_key, Resource as HuwiseResource
+from pwrd.huwise import _get_api_key, Resource as HuwiseResource, Client as HuwiseClient
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +65,8 @@ class Resource(HuwiseResource):
         return cache_path
 
 
-class Client(Mapping):
-    """A client class for querying a Huwise (Opendatasoft) API."""
+class Client(HuwiseClient):
+    """A client class for querying the National Grid connecteddata API."""
 
     name = "nged"
 
@@ -146,19 +145,3 @@ class Client(Mapping):
                 time.sleep(0.1)
 
         return catalogue
-
-    def __getitem__(self, name: str) -> Resource:
-        """Return the item as a Resource."""
-        return self.catalogue[name]
-
-    def keys(self):
-        """All keys in the catalogue."""
-        return self.catalogue.keys()
-
-    def __len__(self) -> int:
-        """The number of entries in the catalogue."""
-        return len(self.catalogue)
-
-    def __iter__(self):
-        """Iterate through the keys in the catalogue."""
-        yield from self.catalogue.keys()
