@@ -4,7 +4,6 @@ import logging
 import time
 from functools import cached_property
 from pathlib import Path
-from urllib.parse import quote, urlencode
 
 import httpx
 
@@ -41,42 +40,6 @@ class Client(HuwiseClient):
         headers = {"Authorization": f"{_get_api_key(self.name)}"}
         self.client = httpx.Client(base_url=base_url, headers=headers, timeout=30.0)
         self.cache_path = Path("./")
-
-    def _api_call(
-        self,
-        api_url: str,
-        *,
-        limit: int = 20,
-        sleep: float = 2.0,
-        **kwargs,
-    ) -> list[dict]:
-        """Make a generic API call handling pagination."""
-        # By setting limit = 0 we get no data, just how many entries
-        # there are in the dataset
-        params = kwargs | {"limit": 0}
-        params = urlencode(params, safe="()", quote_via=quote)
-
-        r = self.client.get(api_url, params=params)
-        r.raise_for_status()
-        # Assuming that all data follows a similar pattern of
-        # total_count and results
-        total_count = r.json()["total_count"]
-
-        results = []
-
-        for offset in range(0, total_count, limit):
-            params = kwargs | {"limit": limit, "offset": offset}
-            params = urlencode(params, safe="()", quote_via=quote)
-            # Make request to API
-            r = self.client.get(api_url, params=params)
-            # Sleep for a bit so we don't make the API angry
-            time.sleep(sleep)
-            # Check that the status is good
-            r.raise_for_status()
-            # Add the results to results
-            results += r.json()["results"]
-
-        return results
 
     @cached_property
     def catalogue(self) -> dict[str, Resource]:
