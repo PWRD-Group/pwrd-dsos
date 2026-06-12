@@ -5,35 +5,13 @@ import time
 from collections.abc import Mapping
 from functools import cached_property
 from pathlib import Path
-from textwrap import dedent
 from urllib.parse import quote, urlencode
 
 import httpx
 
+from pwrd.huwise import _get_api_key
+
 logger = logging.getLogger(__name__)
-
-DEFAULT_CONFIG_PATH = Path().home() / ".config" / "nged.toml"
-
-
-def _get_api_key(name: str, config_path: Path = DEFAULT_CONFIG_PATH) -> str:
-    """Read the API key from a file in a .config directory."""
-    if not config_path.exists():
-        msg = dedent(f"""\
-        No API key found.
-        Create the file and put your token inside:
-        {config_path}
-        Example:
-        echo 'YOUR_API_TOKEN' > {config_path}
-        chmod 600 {config_path}
-        """)
-        raise FileNotFoundError(msg)
-
-    with config_path.open("rb") as f:
-        import tomllib
-
-        api_key = tomllib.load(f)["credentials"][name].strip()
-
-    return api_key
 
 
 class Resource:
