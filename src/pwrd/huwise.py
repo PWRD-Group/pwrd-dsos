@@ -84,10 +84,9 @@ class Resource:
         logger.info("%s doesn't exist in cache... downloading", cache_path)
         # Make the cache directory if it doesn't exist
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-
         with (
             cache_path.open("wb") as f,
-            self.client.client.stream("GET", f"/{self.name}/exports/{ext}") as r,
+            self.client.client.stream("GET", href) as r,
         ):
             for data in r.iter_raw():
                 f.write(data)
