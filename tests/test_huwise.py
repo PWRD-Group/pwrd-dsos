@@ -38,12 +38,7 @@ def test_client(httpx_mock):
     assert client.name == "ukpowernetworks"
     base_url = client.client.base_url
 
-    httpx_mock.add_response(
-        url=base_url, match_params={"limit": "0"}, json={"total_count": 5}
-    )
-
     resources_data = {"results": [{"dataset_id": 1}, {"dataset_id": 2}]}
-
     httpx_mock.add_response(
         url=base_url,
         match_params={"limit": ANY, "offset": ANY},

@@ -98,6 +98,7 @@ class Client(Mapping):
     """A client class for querying a Huwise (Opendatasoft) API."""
 
     name: ClassVar[str]
+    result_field = "results"
 
     def __init__(self) -> None:
         base_url = (
@@ -116,39 +117,34 @@ class Client(Mapping):
         **kwargs,
     ) -> list[dict]:
         """Make a generic API call handling pagination."""
-        # By setting limit = 0 we get no data, just how many entries
-        # there are in the dataset
-        params = kwargs | {"limit": 0}
-        params = urlencode(params, safe="()", quote_via=quote)
-
-        r = self.client.get(api_url, params=params)
-        r.raise_for_status()
-        # Assuming that all data follows a similar pattern of
-        # total_count and results
-        total_count = r.json()["total_count"]
-
-        results = []
-
-        for offset in range(0, total_count, limit):
-            params = kwargs | {"limit": limit, "offset": offset}
-            params = urlencode(params, safe="()", quote_via=quote)
-            # Make request to API
-            r = self.client.get(api_url, params=params)
-            # Sleep for a bit so we don't make the API angry
-            time.sleep(sleep)
-            # Check that the status is good
+        params = kwargs | {"limit": limit, "offset": 0}
+        while True:
+            r = self.client.get(
+                api_url, params=urlencode(params, safe="()", quote_via=quote)
+            )
             r.raise_for_status()
-            # Add the results to results
-            results += r.json()["results"]
 
-        return results
+            result = r.json()[self.result_field]
+            yield result
+
+            if len(result) != params["limit"]:
+                # If we get back fewer entries than the limit we
+                # should be at the end of the pagination
+                break
+            else:
+                params["offset"] += limit
+                time.sleep(sleep)
 
     @cached_property
     def catalogue(self) -> dict[str, Resource]:
         """The available resources."""
-        cat_list = self._api_call("/", limit=100, sleep=0.1)
-        catalogue = {i["dataset_id"]: Resource(self, i) for i in cat_list}
-        if len(catalogue) != len(cat_list):
+        expected_size = 0
+        catalogue = {}
+        for results in self._api_call("/", limit=100, sleep=0.1):
+            for i in results:
+                catalogue[i["dataset_id"]] = Resource(self, i)
+            expected_size += len(results)
+        if len(catalogue) != expected_size:
             msg = "Repeated keys in data catalogue"
             raise ValueError(msg)
         return catalogue
