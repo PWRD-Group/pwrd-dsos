@@ -34,12 +34,11 @@ class Client(HuwiseClient):
 
     name = "nged"
     result_field = "result"
+    base_url = "https://connecteddata.nationalgrid.co.uk/api/3/action/"
 
-    def __init__(self) -> None:
-        base_url = "https://connecteddata.nationalgrid.co.uk/api/3/action/"
-        headers = {"Authorization": f"{_get_api_key(self.name)}"}
-        self.client = httpx.Client(base_url=base_url, headers=headers, timeout=30.0)
-        self.cache_path = Path("./")
+    @property
+    def auth(self) -> str:
+        return f"{_get_api_key(self.name)}"
 
     @cached_property
     def catalogue(self) -> dict[str, Resource]:
