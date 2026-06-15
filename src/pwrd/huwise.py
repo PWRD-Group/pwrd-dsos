@@ -2,7 +2,7 @@
 
 import logging
 import time
-from collections.abc import Mapping
+from collections.abc import Mapping, Iterator
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
@@ -84,10 +84,9 @@ class Resource:
         logger.info("%s doesn't exist in cache... downloading", cache_path)
         # Make the cache directory if it doesn't exist
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-
         with (
             cache_path.open("wb") as f,
-            self.client.client.stream("GET", f"/{self.name}/exports/{ext}") as r,
+            self.client.client.stream("GET", href) as r,
         ):
             for data in r.iter_raw():
                 f.write(data)
@@ -99,14 +98,26 @@ class Client(Mapping):
     """A client class for querying a Huwise (Opendatasoft) API."""
 
     name: ClassVar[str]
+    result_field = "results"
 
     def __init__(self) -> None:
-        base_url = (
+        headers = {"Authorization": self.auth}
+        self.client = httpx.Client(
+            base_url=self.base_url, headers=headers, timeout=30.0
+        )
+        self.cache_path = Path("./")
+
+    @property
+    def base_url(self):
+        """The API base URL."""
+        return (
             f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
         )
-        headers = {"Authorization": f"Apikey {_get_api_key(self.name)}"}
-        self.client = httpx.Client(base_url=base_url, headers=headers, timeout=30.0)
-        self.cache_path = Path("./")
+
+    @property
+    def auth(self):
+        """The value of the Authorization field."""
+        return f"Apikey {_get_api_key(self.name)}"
 
     def _api_call(
         self,
@@ -115,41 +126,36 @@ class Client(Mapping):
         limit: int = 20,
         sleep: float = 2.0,
         **kwargs,
-    ) -> list[dict]:
+    ) -> Iterator[dict]:
         """Make a generic API call handling pagination."""
-        # By setting limit = 0 we get no data, just how many entries
-        # there are in the dataset
-        params = kwargs | {"limit": 0}
-        params = urlencode(params, safe="()", quote_via=quote)
-
-        r = self.client.get(api_url, params=params)
-        r.raise_for_status()
-        # Assuming that all data follows a similar pattern of
-        # total_count and results
-        total_count = r.json()["total_count"]
-
-        results = []
-
-        for offset in range(0, total_count, limit):
-            params = kwargs | {"limit": limit, "offset": offset}
-            params = urlencode(params, safe="()", quote_via=quote)
-            # Make request to API
-            r = self.client.get(api_url, params=params)
-            # Sleep for a bit so we don't make the API angry
-            time.sleep(sleep)
-            # Check that the status is good
+        params = kwargs | {"limit": limit, "offset": 0}
+        while True:
+            r = self.client.get(
+                api_url, params=urlencode(params, safe="()", quote_via=quote)
+            )
             r.raise_for_status()
-            # Add the results to results
-            results += r.json()["results"]
 
-        return results
+            result = r.json()[self.result_field]
+            yield result
+
+            if len(result) != params["limit"]:
+                # If we get back fewer entries than the limit we
+                # should be at the end of the pagination
+                break
+            else:
+                params["offset"] += limit
+                time.sleep(sleep)
 
     @cached_property
     def catalogue(self) -> dict[str, Resource]:
         """The available resources."""
-        cat_list = self._api_call("/", limit=100, sleep=0.1)
-        catalogue = {i["dataset_id"]: Resource(self, i) for i in cat_list}
-        if len(catalogue) != len(cat_list):
+        expected_size = 0
+        catalogue = {}
+        for results in self._api_call("/", limit=100, sleep=0.1):
+            for i in results:
+                catalogue[i["dataset_id"]] = Resource(self, i)
+            expected_size += len(results)
+        if len(catalogue) != expected_size:
             msg = "Repeated keys in data catalogue"
             raise ValueError(msg)
         return catalogue
