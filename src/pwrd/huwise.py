@@ -107,10 +107,12 @@ class Client(Mapping):
 
     @property
     def base_url(self):
+        """The API base URL."""
         return f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
 
     @property
     def auth(self):
+        """The value of the Authorization field."""
         return f"Apikey {_get_api_key(self.name)}"
 
     def _api_call(
