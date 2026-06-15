@@ -102,13 +102,17 @@ class Client(Mapping):
 
     def __init__(self) -> None:
         headers = {"Authorization": self.auth}
-        self.client = httpx.Client(base_url=self.base_url, headers=headers, timeout=30.0)
+        self.client = httpx.Client(
+            base_url=self.base_url, headers=headers, timeout=30.0
+        )
         self.cache_path = Path("./")
 
     @property
     def base_url(self):
         """The API base URL."""
-        return f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
+        return (
+            f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
+        )
 
     @property
     def auth(self):
