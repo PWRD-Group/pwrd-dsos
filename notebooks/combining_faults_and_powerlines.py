@@ -7,7 +7,7 @@ with app.setup:
     import geopandas as gpd
     import marimo as mo
     import pandas as pd
-    from pwrd.huwise import UKPNClient
+    from pwrd.dnos import UKPNClient
 
     client = UKPNClient()
 

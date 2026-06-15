@@ -26,7 +26,7 @@ def _():
 @app.cell
 def _():
     from pwrd.earthdatahub import LocalCache, era5
-    from pwrd.huwise import UKPNClient
+    from pwrd.dnos import UKPNClient
 
     # We are going to cache files in the current directory
     local_cache = LocalCache()

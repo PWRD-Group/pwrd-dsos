@@ -50,7 +50,7 @@ def _():
 
 @app.cell
 def _(earth_ds):
-    from pwrd.huwise import UKPNClient
+    from pwrd.dnos import UKPNClient
     client = UKPNClient()
     iis = client["ukpn-iis"]
     incidents = gpd.read_parquet(iis.file("parquet"))
