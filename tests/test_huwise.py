@@ -38,12 +38,7 @@ def test_client(httpx_mock):
     assert client.name == "ukpowernetworks"
     base_url = client.client.base_url
 
-    httpx_mock.add_response(
-        url=base_url, match_params={"limit": "0"}, json={"total_count": 5}
-    )
-
     resources_data = {"results": [{"dataset_id": 1}, {"dataset_id": 2}]}
-
     httpx_mock.add_response(
         url=base_url,
         match_params={"limit": ANY, "offset": ANY},
@@ -88,15 +83,16 @@ def test_resource(httpx_mock, tmp_path):
     assert resource.name == "example"
     assert len(resource) == n_records
 
+    file_url = f"{base_url}{resource.name}/exports/{file_ext}"
+
     # Adds a mocked response for calls to exports
     httpx_mock.add_response(
         url=f"{base_url}{resource.name}/exports",
-        json={"links": [{"rel": file_ext, "href": "href"}]},
+        json={"links": [{"rel": file_ext, "href": file_url}]},
         is_reusable=True,  # We will call this more than once
     )
 
     # Add a mocked response for file download
-    file_url = f"{base_url}{resource.name}/exports/{file_ext}"
     httpx_mock.add_response(
         url=file_url,
         stream=IteratorStream([b"part1", b"part2"]),
