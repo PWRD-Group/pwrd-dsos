@@ -4,8 +4,6 @@ import logging
 from functools import cached_property
 from pathlib import Path
 
-import httpx
-
 from pwrd.huwise import _get_api_key, Resource as HuwiseResource, Client as HuwiseClient
 
 logger = logging.getLogger(__name__)
@@ -38,6 +36,7 @@ class Client(HuwiseClient):
 
     @property
     def auth(self) -> str:
+        """The value of the Authorization field."""
         return f"{_get_api_key(self.name)}"
 
     @cached_property
