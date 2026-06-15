@@ -8,7 +8,7 @@ with app.setup:
     import marimo as mo
     import pandas as pd
 
-    from pwrd.huwise import UKPNClient
+    from pwrd.dnos import UKPNClient
 
 
 @app.cell(hide_code=True)

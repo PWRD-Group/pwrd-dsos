@@ -2,6 +2,7 @@ import geopandas as gpd
 from pandas.api.extensions import register_dataframe_accessor
 
 from pwrd import grouping, incidents
+from . import dnos  # noqa: F401
 
 
 @register_dataframe_accessor("pwrd")

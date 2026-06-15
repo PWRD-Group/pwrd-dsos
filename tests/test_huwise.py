@@ -5,12 +5,12 @@ import pytest
 from pytest_httpx import IteratorStream
 
 
-from pwrd import huwise
+import pwrd
 
 
 def test_get_api_key_not_exists(tmp_path):
     with pytest.raises(FileNotFoundError):
-        huwise._get_api_key(
+        pwrd.dnos.base._get_api_key(
             "string",
             config_path=tmp_path / "doesnt_exist",
         )
@@ -25,16 +25,16 @@ def test_get_api_key_exists(tmp_path):
 
     config_toml = tmp_path / "config.toml"
     config_toml.write_text(dummy_data, encoding="utf-8")
-    assert huwise._get_api_key("test", config_toml) == dummy_api_key
+    assert pwrd.dnos.base._get_api_key("test", config_toml) == dummy_api_key
 
 
 def test_client(httpx_mock):
 
-    huwise._get_api_key = Mock(return_value="XYZ")
+    pwrd.dnos.base._get_api_key = Mock(return_value="XYZ")
 
     # We use UKPNClient as an example, but we could use any of the
     # providers. Can potentially parametrize?
-    client = huwise.UKPNClient()
+    client = pwrd.dnos.UKPNClient()
     assert client.name == "ukpowernetworks"
     base_url = client.client.base_url
 
@@ -56,13 +56,13 @@ def test_client(httpx_mock):
     assert count == len(client)
 
     # __getitem__ should return a `huwise.Resource`
-    assert isinstance(client[1], huwise.Resource)
+    assert isinstance(client[1], pwrd.dnos.huwise.Resource)
 
 
 def test_resource(httpx_mock, tmp_path):
 
-    huwise._get_api_key = Mock(return_value="XYZ")
-    client = huwise.UKPNClient()
+    pwrd.dnos.base._get_api_key = Mock(return_value="XYZ")
+    client = pwrd.dnos.UKPNClient()
     client.cache_path = tmp_path
     base_url = client.client.base_url
 
@@ -78,7 +78,7 @@ def test_resource(httpx_mock, tmp_path):
 
     # Test that after creating a resource, we can access various
     # properties
-    resource = huwise.Resource(client=client, info=info)
+    resource = pwrd.dnos.huwise.Resource(client=client, info=info)
     assert repr(resource) == f"<Resource name='{resource.name}'>"
     assert resource.name == "example"
     assert len(resource) == n_records
