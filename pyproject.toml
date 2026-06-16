@@ -28,6 +28,7 @@ dev = [
     "pytest>=9.0.2",
     "pytest-cov>=7.1.0",
     "pytest-httpx>=0.36.0",
+    "zensical>=0.0.45",
 ]
 marimo = [
     "aiohttp>=3.13.3",
