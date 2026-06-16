@@ -1,173 +1,90 @@
 ---
-icon: lucide/rocket
+icon: lucide/zap
 ---
 
-# Get started
+# PWRD
 
-For full documentation visit [zensical.org](https://zensical.org/docs/).
+`pwrd` is a Python package for working with open data from UK based
+Distribution Network Operators (DNOs).
 
-## Commands
+## Motivation
 
-* [`zensical new`][new] - Create a new project
-* [`zensical serve`][serve] - Start local web server
-* [`zensical build`][build] - Build your site
+`pwrd` has been created to simplify access to open data resources for
+researchers studying energy systems. It's goal is to remove the need
+for "manual" downloads through a web browser, using API calls
+to download data as needed. `pwrd` makes it easier to share scripts
+between collaborators without needing to send over data files required
+for them to run.
 
-  [new]: https://zensical.org/docs/usage/new/
-  [serve]: https://zensical.org/docs/usage/preview/
-  [build]: https://zensical.org/docs/usage/build/
+In addition to data access, `pwrd` implements some commonly used
+methods for working with the types of data DNOs typically supply, and
+an interface to ERA5 data.
 
-## Examples
+## Getting started
 
-### Admonitions
+In order to access a DNO's open data portal, you will first have to
+create an account for it and setup an API key. Once setup, open data
+can be queried using a [`Client`][pwrd.huwise.Client] instance. Each
+DNO has its own [`Client`][pwrd.huwise.Client] that you interact
+with. For example, to access UK Power Networks open data portal you
+use the [`UKPNClient`][pwrd.huwise.UKPNClient].
 
-> Go to [documentation](https://zensical.org/docs/authoring/admonitions/)
+```python
+from pwrd.dnos import UKPNClient
+
+client = UKPNClient()
+```
+
+`Client`s are available for the following DNOs:
+
+- [x] UK Power Networks - `UKPNClient`
+- [x] Electricity North West England - `ENWClient`
+- [x] Northern Power Grid - `NPGClient`
+- [x] Scottish Power Energy Networks - `SPENClient`
+- [ ] National Grid DNO
+- [ ] Scottish & Southern Electricity Networks
+
+All `Client` objects act like `Mapping` objects. Available data
+resources can be queried using the `client.keys()` method, as on would
+query a dictionary.
+
+The values of the [`Client`][pwrd.huwise.Client] objects are
+[`Resource`][pwrd.huwise.Resource] objects. These act as a lightweight
+bridge between the data catalogue and the actual datasets. For example
+
+```python
+resource = client["ukpn_primary_postcode_area"]
+```
 
 !!! note
 
-    This is a **note** admonition. Use it to provide helpful information.
+    `pwrd` doesn't attempt to organise the resources any further
+	than what is done in each of the DNOs open data portals e.g.
+	`"ukpn_primary_postcode_area"` won't work across all clients
 
-!!! warning
+Metadata can be queried using the `.info` attribute. This returns data
+available from each open data portal API. There is no guarantee that
+the structure of this metadata is consistent across DNOs.
 
-    This is a **warning** admonition. Be careful!
+To perform file download, use the [`.file`][pwrd.huwise.Resource.file]
+method on the
+[`Resource`][pwrd.huwise.Resource]. [`.file`][pwrd.huwise.Resource.file]
+returns a [`Path`][path-object] object to the resulting downloaded
+file. If the file has been downloaded previously, no new download is
+performed and the path to the file is returned instantly.
 
-### Details
-
-> Go to [documentation](https://zensical.org/docs/authoring/admonitions/#collapsible-blocks)
-
-??? info "Click to expand for more info"
-
-    This content is hidden until you click to expand it.
-    Great for FAQs or long explanations.
-
-## Code Blocks
-
-> Go to [documentation](https://zensical.org/docs/authoring/code-blocks/)
-
-``` python hl_lines="2" title="Code blocks"
-def greet(name):
-    print(f"Hello, {name}!") # (1)!
-
-greet("Python")
+```python
+file_path = resource.file("parquet")
 ```
 
-1.  > Go to [documentation](https://zensical.org/docs/authoring/code-blocks/#code-annotations)
+This can then be opened for analysis as normal. For example with
+[`geopandas`][geopandas]
 
-    Code annotations allow to attach notes to lines of code.
+```python
+import geopandas as gpd
 
-Code can also be highlighted inline: `#!python print("Hello, Python!")`.
-
-## Content tabs
-
-> Go to [documentation](https://zensical.org/docs/authoring/content-tabs/)
-
-=== "Python"
-
-    ``` python
-    print("Hello from Python!")
-    ```
-
-=== "Rust"
-
-    ``` rs
-    println!("Hello from Rust!");
-    ```
-
-## Diagrams
-
-> Go to [documentation](https://zensical.org/docs/authoring/diagrams/)
-
-``` mermaid
-graph LR
-  A[Start] --> B{Error?};
-  B -->|Yes| C[Hmm...];
-  C --> D[Debug];
-  D --> B;
-  B ---->|No| E[Yay!];
+gdf = gpd.read_parquet(file_path)
 ```
 
-## Footnotes
-
-> Go to [documentation](https://zensical.org/docs/authoring/footnotes/)
-
-Here's a sentence with a footnote.[^1]
-
-Hover it, to see a tooltip.
-
-[^1]: This is the footnote.
-
-
-## Formatting
-
-> Go to [documentation](https://zensical.org/docs/authoring/formatting/)
-
-- ==This was marked (highlight)==
-- ^^This was inserted (underline)^^
-- ~~This was deleted (strikethrough)~~
-- H~2~O
-- A^T^A
-- ++ctrl+alt+del++
-
-## Icons, Emojis
-
-> Go to [documentation](https://zensical.org/docs/authoring/icons-emojis/)
-
-* :sparkles: `:sparkles:`
-* :rocket: `:rocket:`
-* :tada: `:tada:`
-* :memo: `:memo:`
-* :eyes: `:eyes:`
-
-## Maths
-
-> Go to [documentation](https://zensical.org/docs/authoring/math/)
-
-$$
-\cos x=\sum_{k=0}^{\infty}\frac{(-1)^k}{(2k)!}x^{2k}
-$$
-
-!!! warning "Needs configuration"
-    Note that MathJax is included via a `script` tag on this page and is not
-    configured in the generated default configuration to avoid including it
-    in a pages that do not need it. See the documentation for details on how
-    to configure it on all your pages if they are more Maths-heavy than these
-    simple starter pages.
-
-<script id="MathJax-script" src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [["\\(", "\\)"]],
-      displayMath: [["\\[", "\\]"]],
-      processEscapes: true,
-      processEnvironments: true
-    },
-    options: {
-      ignoreHtmlClass: ".*|",
-      processHtmlClass: "arithmatex"
-    }
-  };
-
-  document$.subscribe(() => {
-    MathJax.startup.output.clearCache()
-    MathJax.typesetClear()
-    MathJax.texReset()
-    MathJax.typesetPromise()
-  })
-</script>
-
-## Task Lists
-
-> Go to [documentation](https://zensical.org/docs/authoring/lists/#using-task-lists)
-
-* [x] Install Zensical
-* [x] Configure `zensical.toml`
-* [x] Write amazing documentation
-* [ ] Deploy anywhere
-
-## Tooltips
-
-> Go to [documentation](https://zensical.org/docs/authoring/tooltips/)
-
-[Hover me][example]
-
-  [example]: https://example.com "I'm a tooltip!"
+[geopandas]: https://geopandas.org/en/stable/
+[path-object]: https://docs.python.org/3/library/pathlib.html#pathlib.Path
