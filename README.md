@@ -1,7 +1,6 @@
 # PWRD
 
-[![pipeline status](https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/badges/main/pipeline.svg)](https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/-/commits/main)
-[![coverage report](https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/badges/main/coverage.svg)](https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/-/commits/main)
+[![CI](https://github.com/PWRD-Group/pwrd-dsos/actions/workflows/ci.yml/badge.svg)](https://github.com/PWRD-Group/pwrd-dsos/actions/workflows/ci.yml)
 
 ## Getting started
 
@@ -28,10 +27,6 @@ package so you don't mess up any other projects accidentally.  See
 setup instructions if not using `PowerShell` on Windows or `bash/zsh`
 on Linux/MacOS.
 
-You will probably be required to enter your gitlab username and
-password. If you have setup 2FA your password will be a personal
-access token rather than your standard password.
-
 ##### Windows
 
 > [!caution]
@@ -40,7 +35,7 @@ access token rather than your standard password.
 ```
 python -m venv C:\path\to\new\virtual\environment
 C:\path\to\new\virtual\environment\Scripts\Activate.ps1
-python -m pip install git+https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project.git
+python -m pip install git+https://github.com/PWRD-Group/pwrd-dsos.git
 ```
 
 ##### Linux/MacOS
@@ -48,7 +43,7 @@ python -m pip install git+https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project.gi
 ```
 python -m venv /path/to/new/virtual/environment
 source /path/to/new/virtual/environment/bin/activate
-python -m pip install git+https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project.git
+python -m pip install git+https://github.com/PWRD-Group/pwrd-dsos.git
 ```
 
 #### `git clone` and `uv`
@@ -60,8 +55,8 @@ notebooks, then I recommend installing `uv`. See
 First clone the repo
 
 ```
-git clone https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project.git
-cd rsg-project/
+git clone https://github.com/PWRD-Group/pwrd-dsos.git
+cd pwrd-dsos/
 uv sync --group marimo
 ```
 
@@ -71,10 +66,9 @@ You can now run `marimo` to view the notebooks
 uv run marimo edit
 ```
 
-## RSG project notebooks
+## Notebooks
 
-This repository contains [marimo](https://docs.marimo.io) notebooks
-developed during the course of the RSG project: `fcod-donalddl-1`.
+This repository contains [marimo](https://docs.marimo.io) notebooks.
 The notebooks are used in an exploratory manner to investigate the
 kinds of analyses that are performed. The long term aim is to extract
 common pieces of code into a maintainable package with tests,
