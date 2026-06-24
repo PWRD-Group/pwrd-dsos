@@ -8,7 +8,7 @@ with app.setup:
     import matplotlib.pyplot as plt
     import pandas as pd
     import geopandas as gpd
-    from pwrd.huwise import UKPNClient
+    from pwrd.dnos import UKPNClient
 
     ukpn_client = UKPNClient()
 

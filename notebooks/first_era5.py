@@ -11,7 +11,7 @@ with app.setup:
     # For markdown
     import marimo as mo
 
-    from pwrd.huwise import UKPNClient
+    from pwrd.dnos import UKPNClient
 
     ukpn_client = UKPNClient()
 
@@ -23,7 +23,7 @@ def _():
 
     This is a first look at getting data from ERA5 for future analysis. We get the data via from the [Earth Data Hub](https://earthdatahub.destine.eu/collections/era5) which can be obtained in the [Zarr](https://zarr.dev) format. This means we can do various operations on the data before we do any downloads, stopping us (hopefully) from maxing out of API limits.
 
-    To test aggregating the data by area, GSP data obtained from UKPN, using the `huwise` module. We can get a shortcut to the ERA5 data from our `earthdatahub.era5` module.
+    To test aggregating the data by area, GSP data obtained from UKPN, using the `dnos` module. We can get a shortcut to the ERA5 data from our `earthdatahub.era5` module.
     """)
     return
 

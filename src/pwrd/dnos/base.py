@@ -47,20 +47,14 @@ class Resource:
     @property
     def name(self) -> str:
         """The dataset identifier."""
-        return self.info["dataset_id"]
+        raise NotImplementedError
 
     def __repr__(self) -> str:
         return f"<Resource name='{self.name}'>"
 
-    def __len__(self) -> int:
-        """The record count."""
-        return int(self.info["metas"]["default"]["records_count"])
-
     def _export_paths(self) -> dict[str, str]:
         """A dictionary of allowed file types to export (download)."""
-        r = self.client.client.get(f"/{self.name}/exports")
-        r.raise_for_status()
-        return {i["rel"]: i["href"] for i in r.json()["links"]}
+        raise NotImplementedError
 
     def file(self, ext: str) -> Path:
         """Get the local path to the file.
@@ -98,7 +92,7 @@ class Client(Mapping):
     """A client class for querying a Huwise (Opendatasoft) API."""
 
     name: ClassVar[str]
-    result_field = "results"
+    result_field: ClassVar[str]
 
     def __init__(self) -> None:
         headers = {"Authorization": self.auth}
@@ -110,14 +104,12 @@ class Client(Mapping):
     @property
     def base_url(self):
         """The API base URL."""
-        return (
-            f"https://{self.name}.opendatasoft.com/api/explore/v2.1/catalog/datasets/"
-        )
+        raise NotImplementedError
 
     @property
     def auth(self):
         """The value of the Authorization field."""
-        return f"Apikey {_get_api_key(self.name)}"
+        raise NotImplementedError
 
     def _api_call(
         self,
@@ -149,16 +141,7 @@ class Client(Mapping):
     @cached_property
     def catalogue(self) -> dict[str, Resource]:
         """The available resources."""
-        expected_size = 0
-        catalogue = {}
-        for results in self._api_call("/", limit=100, sleep=0.1):
-            for i in results:
-                catalogue[i["dataset_id"]] = Resource(self, i)
-            expected_size += len(results)
-        if len(catalogue) != expected_size:
-            msg = "Repeated keys in data catalogue"
-            raise ValueError(msg)
-        return catalogue
+        raise NotImplementedError
 
     def __getitem__(self, name: str) -> Resource:
         """Return the item as a Resource."""
@@ -175,40 +158,3 @@ class Client(Mapping):
     def __iter__(self):
         """Iterate through the keys in the catalogue."""
         yield from self.catalogue.keys()
-
-
-class UKPNClient(Client):
-    """Client for UK Power Networks API.
-
-    Covers East England, London, and South East England.
-    """
-
-    name = "ukpowernetworks"
-
-
-class ENWClient(Client):
-    """Client for Electricity North West England API.
-
-    Covers North West England.
-    """
-
-    name = "electricitynorthwest"
-
-
-class SPENClient(Client):
-    """Client for Scottish Power Energy Networks API.
-
-    Covers South and Central Scotland, North Wales, Merseyside and
-    Cheshire.
-    """
-
-    name = "spenergynetworks"
-
-
-class NPGClient(Client):
-    """Client for Northern Power Grid API.
-
-    Covers Yorkshire and North East England.
-    """
-
-    name = "northernpowergrid"
