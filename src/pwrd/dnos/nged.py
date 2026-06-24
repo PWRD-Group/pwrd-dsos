@@ -4,12 +4,12 @@ import logging
 from functools import cached_property
 from pathlib import Path
 
-from pwrd.huwise import _get_api_key, Resource as HuwiseResource, Client as HuwiseClient
+from pwrd.dnos import base
 
 logger = logging.getLogger(__name__)
 
 
-class Resource(HuwiseResource):
+class Resource(base.Resource):
     """An NGED resource."""
 
     @property
@@ -19,15 +19,13 @@ class Resource(HuwiseResource):
         # stem works a bit better for compatibility
         return str(Path(self.info["resource"]["url"]).stem)
 
-    # TODO: We need to do something about __len__
-
     def _export_paths(self) -> dict[str, str]:
         """A dictionary of allowed file types to export (download)."""
         info = self.info["resource"]
         return {info["format"].lower(): info["url"]}
 
 
-class Client(HuwiseClient):
+class Client(base.Client):
     """A client class for querying the National Grid connecteddata API."""
 
     name = "nged"
@@ -37,7 +35,7 @@ class Client(HuwiseClient):
     @property
     def auth(self) -> str:
         """The value of the Authorization field."""
-        return f"{_get_api_key(self.name)}"
+        return f"{base._get_api_key(self.name)}"
 
     @cached_property
     def catalogue(self) -> dict[str, Resource]:
