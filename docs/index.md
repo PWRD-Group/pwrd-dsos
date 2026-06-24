@@ -24,10 +24,10 @@ an interface to ERA5 data.
 
 In order to access a DNO's open data portal, you will first have to
 create an account for it and setup an API key. Once setup, open data
-can be queried using a [`Client`][pwrd.huwise.Client] instance. Each
-DNO has its own [`Client`][pwrd.huwise.Client] that you interact
+can be queried using a `Client` instance. Each
+DNO has its own `Client` that you interact
 with. For example, to access UK Power Networks open data portal you
-use the [`UKPNClient`][pwrd.huwise.UKPNClient].
+use the [`UKPNClient`][pwrd.dnos.UKPNClient].
 
 ```python
 from pwrd.dnos import UKPNClient
@@ -37,11 +37,11 @@ client = UKPNClient()
 
 `Client`s are available for the following DNOs:
 
-- [x] UK Power Networks - `UKPNClient`
-- [x] Electricity North West England - `ENWClient`
-- [x] Northern Power Grid - `NPGClient`
-- [x] Scottish Power Energy Networks - `SPENClient`
-- [ ] National Grid DNO
+- [x] UK Power Networks - [`UKPNClient`][pwrd.dnos.UKPNClient]
+- [x] Electricity North West England - [`ENWClient`][pwrd.dnos.ENWClient]
+- [x] Northern Power Grid - [`NPGClient`][pwrd.dnos.NPGClient]
+- [x] Scottish Power Energy Networks - [`SPENClient`][pwrd.dnos.SPENClient]
+- [x] National Grid DNO - [`NGEDClient`][pwrd.dnos.NGEDClient]
 - [ ] Scottish & Southern Electricity Networks
 
 All `Client` objects act like `Mapping` objects. Available data

@@ -1980,6 +1980,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "mkdocs-autorefs" },
     { name = "mkdocstrings-python" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -2015,6 +2016,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "mkdocs-autorefs", specifier = ">=1.4.4" },
     { name = "mkdocstrings-python", specifier = ">=2.0.4" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
