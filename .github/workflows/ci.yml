@@ -12,7 +12,7 @@ jobs:
       image: ghcr.io/astral-sh/uv:debian-slim
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install deps
         run: uv sync --dev
@@ -21,7 +21,7 @@ jobs:
         run: uv run pytest --cov=src --cov-report=xml --cov-report=term tests
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-xml
           path: coverage.xml
@@ -32,7 +32,7 @@ jobs:
       image: ghcr.io/astral-sh/uv:debian-slim
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install marimo deps
         run: uv sync --group marimo
@@ -46,7 +46,7 @@ jobs:
       image: ghcr.io/astral-sh/uv:debian-slim
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install deps
         run: uv sync
@@ -60,7 +60,7 @@ jobs:
       image: ghcr.io/astral-sh/uv:debian-slim
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install deps
         run: uv sync
@@ -74,7 +74,7 @@ jobs:
       image: ghcr.io/astral-sh/uv:debian-slim
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install deps
         run: uv sync
