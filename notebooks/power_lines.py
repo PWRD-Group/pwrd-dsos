@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.4"
+__generated_with = "0.22.4"
 app = marimo.App(width="medium")
 
 with app.setup:
@@ -11,12 +11,6 @@ with app.setup:
     from pwrd.dnos import UKPNClient
 
     ukpn_client = UKPNClient()
-
-
-@app.cell
-def _():
-    ukpn_client["ukpn_primary_postcode_area"].info
-    return
 
 
 @app.cell(hide_code=True)
