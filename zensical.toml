@@ -17,12 +17,12 @@ site_name = "PWRD"
 # meaningful description of the site content for use by search engines.
 #
 # Read more: https://zensical.org/docs/setup/basics/#site_description
-site_description = "A new project generated from the default template project."
+site_description = "A Python package for power system analysis"
 
 # The site_author attribute. This is used in the HTML head element.
 #
 # Read more: https://zensical.org/docs/setup/basics/#site_author
-site_author = "<your name here>"
+site_author = "Daniel Donaldson"
 
 # The site_url is the canonical URL for your site. When building online
 # documentation you should set this.
@@ -34,7 +34,7 @@ site_author = "<your name here>"
 #
 # Read more: https://zensical.org/docs/setup/basics/#copyright
 copyright = """
-Copyright &copy; 2026 The authors
+Copyright &copy; 2026 Daniel Donaldson
 """
 
 # Zensical supports both implicit navigation and explicitly defined navigation.
@@ -265,8 +265,8 @@ features = [
 # - https://zensical.org/docs/setup/logo-and-icons
 # - https://github.com/zensical/ui/tree/master/dist/.icons
 # ----------------------------------------------------------------------------
-#[project.theme.icon]
-#logo = "lucide/smile"
+[project.theme.icon]
+logo = "lucide/zap"
 
 # ----------------------------------------------------------------------------
 # In the "font" subsection you can configure the fonts used. By default, fonts
@@ -300,9 +300,9 @@ toggle.name = "Switch to light mode"
 # ----------------------------------------------------------------------------
 # The "extra" section contains miscellaneous settings.
 # ----------------------------------------------------------------------------
-#[[project.extra.social]]
-#icon = "fontawesome/brands/github"
-#link = "https://github.com/user/repo"
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/PWRD-Group/pwrd-dsos"
 
 # ----------------------------------------------------------------------------
 # In this section you can configure the Markdown extensions that are used when
@@ -357,3 +357,4 @@ docstring_style = "numpy"
 inherited_members = true
 show_source = false
 show_root_heading = true
+show_signature_annotations = true
