@@ -44,12 +44,13 @@ client = UKPNClient()
 - [x] National Grid DNO - [`NGEDClient`][pwrd.dnos.NGEDClient]
 - [ ] Scottish & Southern Electricity Networks
 
-All `Client` objects act like `Mapping` objects. Available data
-resources can be queried using the `client.keys()` method, as on would
-query a dictionary.
+All [`Client`][pwrd.dnos.base.Client] objects act like
+[`Mapping`][collections.abc.Mapping] objects. Available data resources
+can be queried using the [`client.keys()`][pwrd.dnos.base.Client.keys]
+method, as one would query a dictionary.
 
-The values of the [`Client`][pwrd.huwise.Client] objects are
-[`Resource`][pwrd.huwise.Resource] objects. These act as a lightweight
+The values of the [`Client`][pwrd.dnos.base.Client] objects are
+[`Resource`][pwrd.dnos.base.Resource] objects. These act as a lightweight
 bridge between the data catalogue and the actual datasets. For example
 
 ```python
@@ -66,10 +67,10 @@ Metadata can be queried using the `.info` attribute. This returns data
 available from each open data portal API. There is no guarantee that
 the structure of this metadata is consistent across DNOs.
 
-To perform file download, use the [`.file`][pwrd.huwise.Resource.file]
+To perform file download, use the [`.file`][pwrd.dnos.base.Resource.file]
 method on the
-[`Resource`][pwrd.huwise.Resource]. [`.file`][pwrd.huwise.Resource.file]
-returns a [`Path`][path-object] object to the resulting downloaded
+[`Resource`][pwrd.dnos.base.Resource]. [`.file`][pwrd.dnos.base.Resource.file]
+returns a [`Path`][pathlib.Path] object to the resulting downloaded
 file. If the file has been downloaded previously, no new download is
 performed and the path to the file is returned instantly.
 
@@ -87,4 +88,3 @@ gdf = gpd.read_parquet(file_path)
 ```
 
 [geopandas]: https://geopandas.org/en/stable/
-[path-object]: https://docs.python.org/3/library/pathlib.html#pathlib.Path
