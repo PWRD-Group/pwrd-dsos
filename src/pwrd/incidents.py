@@ -49,11 +49,13 @@ class Mixin:
 
         Returns
         -------
-        An xarray.DataArray with coordinates `geometry` and `valid_time`.
-        The `geometry` coordinates will be the same length as the number of
-        input geometries in the `areas` parameter, and the `valid_time`
-        coordinate will be from the first earliest start time to the latest
-        end time, with a frequency determined by the `freq` parameter.
+        xarray.DataArray
+            An `xarray.DataArray` with coordinates `geometry` and
+            `valid_time`.  The `geometry` coordinates will be the same
+            length as the number of input geometries in the `areas`
+            parameter, and the `valid_time` coordinate will be from
+            the first earliest start time to the latest end time, with
+            a frequency determined by the `freq` parameter.
 
         Notes
         -----
@@ -120,6 +122,12 @@ class Mixin:
         customers
             The name of the columns that contains the number of customers
             affected by the incident
+
+        Returns
+        -------
+        pd.DataFrame
+            A `pd.DataFrame` with columns outage, restoration, and
+            resilience (which is restoration - outage)
         """
         # We group by the start and end times (which will do a sort by
         # default) and then we sum up (eventually cumulatively) how

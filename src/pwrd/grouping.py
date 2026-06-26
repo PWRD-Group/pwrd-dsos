@@ -98,8 +98,9 @@ class Mixin:
 
         Returns
         -------
-        An `xarray.DataArray` in the format that `xvec` uses i.e. has a
-        `geometry` dimension.
+        xarray.DataArray
+            An `xarray.DataArray` in the format that `xvec` uses
+            i.e. has a `geometry` dimension.
         """
         out = line_length_in_areas(self._df, areas, crs)
 
@@ -112,6 +113,13 @@ class Mixin:
         return xarray_to_xvec(out.to_xarray(), areas)
 
     def points_in_areas(self, areas):
-        """Count the number of points in given areas."""
+        """Count the number of points in given areas.
+
+        Returns
+        -------
+        xarray.DataArray
+            An `xarray.DataArray` in the format that `xvec` uses
+            i.e. has a `geometry` dimension.
+        """
         out = points_in_areas(self._df, areas)
         return xarray_to_xvec(out.to_xarray(), areas)

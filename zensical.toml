@@ -349,7 +349,10 @@ custom_checkbox = true
 [project.markdown_extensions.pymdownx.tilde]
 
 [project.plugins.mkdocstrings.handlers.python]
-inventories = ["https://docs.python.org/3/objects.inv"]
+inventories = ["https://docs.python.org/3/objects.inv",
+	       "https://pandas.pydata.org/docs/objects.inv",
+	       "https://docs.xarray.dev/en/stable/objects.inv",
+	       "https://geopandas.org/en/stable/objects.inv"]
 paths = ["src", "src/pwrd"]
 
 [project.plugins.mkdocstrings.handlers.python.options]
