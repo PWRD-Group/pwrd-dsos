@@ -1,4 +1,4 @@
-"""A client for downloading datasets from a Huwise OpenData portal."""
+"""A client for downloading datasets from an open data portal."""
 
 import logging
 import time
@@ -38,7 +38,7 @@ def _get_api_key(name: str, config_path: Path = DEFAULT_CONFIG_PATH) -> str:
 
 
 class Resource:
-    """A OpenData resource."""
+    """A resource that can possibly be downloaded from an open data portal."""
 
     def __init__(self, client: "Client", info: dict) -> None:
         self.client = client
@@ -61,6 +61,21 @@ class Resource:
 
         If the file doesn't exist locally in the cache, then it is
         downloaded.
+
+        Parameters
+        ----------
+        ext
+            The file extension to return
+
+        Returns
+        -------
+        pathlib.Path
+            The local path to the file
+
+        Raises
+        ------
+        ValueError
+            If the file is not available in the requested format
         """
         # TODO: Add some check for if the file has been modified
         # https://gitlab.bham.ac.uk/donalddl-pwrd/rsg-project/-/work_items/1
@@ -89,7 +104,7 @@ class Resource:
 
 
 class Client(Mapping):
-    """A client class for querying a Huwise (Opendatasoft) API."""
+    """A client class for querying an open data API."""
 
     name: ClassVar[str]
     result_field: ClassVar[str]

@@ -28,7 +28,7 @@ class Mixin:
         reference: str,
         freq: str = "h",
     ) -> xr.DataArray:
-        """Count the number of faults in areas starting at a given frequency.
+        """Aggregate faults by area and start time.
 
         Parameters
         ----------
@@ -45,20 +45,21 @@ class Mixin:
             The name of the column containing the reference code
             of the incident.
         freq
-            A frequency alias.
+            The time period over which to aggregate new faults,
+            specified by a pandas frequency alias e.g. `h` for hourly
+            counts and `D` for daily counts. See
+            https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
+            for a full list of valid frequency aliases.
 
         Returns
         -------
-        An xarray.DataArray with coordinates `geometry` and `valid_time`.
-        The `geometry` coordinates will be the same length as the number of
-        input geometries in the `areas` parameter, and the `valid_time`
-        coordinate will be from the first earliest start time to the latest
-        end time, with a frequency determined by the `freq` parameter.
-
-        Notes
-        -----
-        See https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
-        for valid frequency aliases.
+        xarray.DataArray
+            An `xarray.DataArray` with coordinates `geometry` and
+            `valid_time`.  The `geometry` coordinates will be the same
+            length as the number of input geometries in the `areas`
+            parameter, and the `valid_time` coordinate will be from
+            the first earliest start time to the latest end time, with
+            a frequency determined by the `freq` parameter.
 
         """
         name = areas.index.name
@@ -111,6 +112,14 @@ class Mixin:
     def resilience(self, start: str, end: str, customers: str) -> pd.DataFrame:
         """Create a resilience dataframe.
 
+        The resilience dataframe contains the cumulative number of
+        customers that have been affected by an outage (outage column)
+        and the cumulative number of customers who have had their
+        power restored (restoration column). The resilience column is
+        the difference between the restoration and outage column
+        i.e. the number of customers at that specific time that are
+        affected by an outage.
+
         Parameters
         ----------
         start
@@ -120,6 +129,14 @@ class Mixin:
         customers
             The name of the columns that contains the number of customers
             affected by the incident
+
+        Returns
+        -------
+        pd.DataFrame
+            A `pd.DataFrame` with a datetime index and with columns
+            outage, restoration, and resilience (which is restoration
+            - outage)
+
         """
         # We group by the start and end times (which will do a sort by
         # default) and then we sum up (eventually cumulatively) how

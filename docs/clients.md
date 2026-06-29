@@ -1,5 +1,10 @@
 # Clients & Resources
 
+[`Clients`](#clients) are used to query data from various
+DSO open data portals. They give access to
+[`Resources`](#resources) which can then be downloaded
+for local analysis.
+
 ## Clients
 
 ::: pwrd.dnos.base.Client
