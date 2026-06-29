@@ -13,7 +13,7 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CONFIG_PATH = Path().home() / ".config" / "huwise.toml"
+DEFAULT_CONFIG_PATH = Path().home() / ".config" / "pwrd.toml"
 
 
 def _get_api_key(name: str, config_path: Path = DEFAULT_CONFIG_PATH) -> str:
