@@ -28,7 +28,9 @@ class Mixin:
         reference: str,
         freq: str = "h",
     ) -> xr.DataArray:
-        """Count the number of faults in areas starting at a given frequency.
+        """Aggregate faults by area and start time.
+
+
 
         Parameters
         ----------
@@ -45,9 +47,11 @@ class Mixin:
             The name of the column containing the reference code
             of the incident.
         freq
-            A frequency alias. See
+            The time period over which to aggregate new faults,
+            specified by a pandas frequency alias e.g. `h` for hourly
+            counts and `D` for daily counts. See
             https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
-            for valid frequency aliases.
+            for a full list of valid frequency aliases.
 
         Returns
         -------
