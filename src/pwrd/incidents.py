@@ -110,6 +110,14 @@ class Mixin:
     def resilience(self, start: str, end: str, customers: str) -> pd.DataFrame:
         """Create a resilience dataframe.
 
+        The resilience dataframe contains the cumulative number of
+        customers that have been affected by an outage (outage column)
+        and the cumulative number of customers who have had their
+        power restored (restoration column). The resilience column is
+        the difference between the restoration and outage column
+        i.e. the number of customers at that specific time that are
+        affected by an outage.
+
         Parameters
         ----------
         start
@@ -123,8 +131,10 @@ class Mixin:
         Returns
         -------
         pd.DataFrame
-            A `pd.DataFrame` with columns outage, restoration, and
-            resilience (which is restoration - outage)
+            A `pd.DataFrame` with a datetime index and with columns
+            outage, restoration, and resilience (which is restoration
+            - outage)
+
         """
         # We group by the start and end times (which will do a sort by
         # default) and then we sum up (eventually cumulatively) how
