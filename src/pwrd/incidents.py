@@ -30,8 +30,6 @@ class Mixin:
     ) -> xr.DataArray:
         """Aggregate faults by area and start time.
 
-
-
         Parameters
         ----------
         areas
