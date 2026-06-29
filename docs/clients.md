@@ -1,8 +1,8 @@
 # Clients & Resources
 
-[`Client`s](#clients) are used to query data from various
+[`Clients`](#clients) are used to query data from various
 DSO open data portals. They give access to
-[`Resource`s](#resources) which can then be downloaded
+[`Resources`](#resources) which can then be downloaded
 for local analysis.
 
 ## Clients
