@@ -45,7 +45,9 @@ class Mixin:
             The name of the column containing the reference code
             of the incident.
         freq
-            A frequency alias.
+            A frequency alias. See
+            https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
+            for valid frequency aliases.
 
         Returns
         -------
@@ -56,11 +58,6 @@ class Mixin:
             parameter, and the `valid_time` coordinate will be from
             the first earliest start time to the latest end time, with
             a frequency determined by the `freq` parameter.
-
-        Notes
-        -----
-        See https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
-        for valid frequency aliases.
 
         """
         name = areas.index.name
