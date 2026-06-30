@@ -3,6 +3,7 @@
 import logging
 from functools import cached_property
 from pathlib import Path
+from typing import override
 
 from pwrd.dnos import base
 
@@ -19,6 +20,7 @@ class Resource(base.Resource):
         # stem works a bit better for compatibility
         return str(Path(self.info["resource"]["url"]).stem)
 
+    @override
     def export_paths(self) -> dict[str, str]:
         info = self.info["resource"]
         return {info["format"].lower(): info["url"]}
