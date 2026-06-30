@@ -18,7 +18,7 @@ for them to run.
 
 In addition to data access, `pwrd` implements some commonly used
 methods for working with the types of data DNOs typically supply, and
-an interface to ERA5 data.
+[an interface to ERA5 data][era5].
 
 ## Getting started
 
