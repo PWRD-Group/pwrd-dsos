@@ -19,8 +19,7 @@ class Resource(base.Resource):
         # stem works a bit better for compatibility
         return str(Path(self.info["resource"]["url"]).stem)
 
-    def _export_paths(self) -> dict[str, str]:
-        """A dictionary of allowed file types to export (download)."""
+    def export_paths(self) -> dict[str, str]:
         info = self.info["resource"]
         return {info["format"].lower(): info["url"]}
 
