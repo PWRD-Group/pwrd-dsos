@@ -2,6 +2,7 @@
 
 import logging
 from functools import cached_property
+from typing import override
 
 
 from pwrd.dnos import base
@@ -21,8 +22,8 @@ class Resource(base.Resource):
         """The record count."""
         return int(self.info["metas"]["default"]["records_count"])
 
-    def _export_paths(self) -> dict[str, str]:
-        """A dictionary of allowed file types to export (download)."""
+    @override
+    def export_paths(self) -> dict[str, str]:
         r = self.client.client.get(f"/{self.name}/exports")
         r.raise_for_status()
         return {i["rel"]: i["href"] for i in r.json()["links"]}

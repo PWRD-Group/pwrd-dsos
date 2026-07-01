@@ -52,8 +52,15 @@ class Resource:
     def __repr__(self) -> str:
         return f"<Resource name='{self.name}'>"
 
-    def _export_paths(self) -> dict[str, str]:
-        """A dictionary of allowed file types to export (download)."""
+    def export_paths(self) -> dict[str, str]:
+        """Find valid extensions to download.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary where the keys are allowed file extensions
+            and the values are the hrefs to the online files.
+        """
         raise NotImplementedError
 
     def file(self, ext: str) -> Path:
@@ -65,7 +72,9 @@ class Resource:
         Parameters
         ----------
         ext
-            The file extension to return
+            The file extension to return (e.g. "parquet"). Allowed
+            file extensions for this `Resource` can be queried using
+            the `Client.export_paths()` method.
 
         Returns
         -------
@@ -85,9 +94,11 @@ class Resource:
 
         # Otherwise we need to download this file
         # First we should check if this exists
-        href = self._export_paths().get(ext)
+        valid_exts = self.export_paths()
+        href = valid_exts.get(ext)
         if not href:
-            msg = f"{self.name} can not be exported as {ext}"
+            msg = f"{self.name} can not be exported as {ext}."
+            f"Valid extensions are {''.join(valid_exts.keys())}"
             raise ValueError(msg)
 
         logger.info("%s doesn't exist in cache... downloading", cache_path)
