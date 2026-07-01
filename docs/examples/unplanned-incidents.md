@@ -42,9 +42,9 @@ supply the column names of the data that contain:
 
 - The start time of each incident
 - The end time of each incident
-- The number of customers affect by each incident
+- The number of customers affected by each incident
 
-We will select only incidents that occured between the 16th and 18th
+We will select only incidents that occurred between the 16th and 18th
 of February 2022. These three days saw two [named
 storms][metoffice-feb22-named-storms] hit the UK, storms Dudley and
 Eunice.
