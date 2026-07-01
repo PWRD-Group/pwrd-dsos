@@ -63,7 +63,7 @@ class PwrdAccessor:
         Parameters
         ----------
         area:
-            A geopandas.GeoDataFrame of areas the bounding box of all
+            A geopandas.GeoDataFrame of areas. The bounding box of all
             areas is used in the data selection.
 
         Returns
@@ -87,7 +87,7 @@ class PwrdAccessor:
 
         ERA5 data from the EarthDataHub has longitudes from 0 to 360
         degrees. This method converts data to use -180 to 180, for
-        consitency with other data sources.
+        consistency with other data sources.
 
         Returns
         -------
