@@ -97,6 +97,7 @@ class NPGClient(Client):
 
     name = "northernpowergrid"
 
+
 class NIEClient(Client):
     """Client for Northern Ireland Electricity Networks API.
 
