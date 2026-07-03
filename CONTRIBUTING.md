@@ -28,36 +28,35 @@ However, at this time, we do not accept the following contributions:
 {Contribution type 3}
 
 ## pwrd-dsos overview
-The purpose of the {Project Name} is to {describe your project's objectives or provide an external link to an introductory document, such as the project's README file}.
-Ground rules
-Before contributing, read our [Code of Conduct](COC.md) to learn more about our community guidelines and expectations.
-Community engagement
-Refer to the following channels to connect with fellow contributors or to stay up-to-date with news about pwrd-dsos:
+pwrd is a Python package for working with open data from UK based Distribution Network Operators (DNOs). For more information, please see the package [documentation](https://pwrd-group.github.io/pwrd-dsos/).
 
-Join our project contributors on {name and link to online chat}.
-Participate in our project meetings on {specify the day of the week and cadence} at {specify time and timezone}, where you can provide a status update or raise questions and concerns about your contributions. Use the following link to join: {link to online meeting space}
-Stay updated on the latest news and changes to the project by signing up to receive our newsletter. Sign up with the following link: {link to the sign-up page for the newsletter}
+## Ground rules
+Before contributing, read our [Code of Conduct](CODE_OF_CONDUCT.md) to learn more about our community guidelines and expectations.
 
 ## Share ideas
-To share your new ideas for the project, perform the following actions:
-
-{Step 1}
-{Step 2}
-{Step 3}
+To share your new ideas for the project, please open a GitHub issue.
 
 ## Before you start
 Before you start contributing, ensure you have the following:
 
-{Item 1}
-{Item 2}
-{Item 3}
+{GitHub account}
+{An account on [https://earthdatahub.destine.eu/](https://earthdatahub.destine.eu/)}
 
 ## Environment setup
-To set up your environment, perform the following actions:
+To set up your environment, you will need to 
 
-{Step 1}
-{Step 2}
-{Step 3}
+{Install Python version 3.13 or higher}
+{Create a venv and install the package as follows}
+```python -m venv /path/to/new/virtual/environment
+source /path/to/new/virtual/environment/bin/activate
+python -m pip install git+https://github.com/PWRD-Group/pwrd-dsos.git```
+
+{Install the project dependencies by cloning the GitHub repo and running `uv sync`}
+```
+git clone https://github.com/PWRD-Group/pwrd-dsos.git
+cd pwrd-dsos/
+uv sync --group marimo
+```
 
 ## Troubleshoot
 If you encounter issues as you set up your environment, refer to the following:
@@ -67,32 +66,27 @@ macOS: {share a link to an external page that shares troubleshooting steps or sh
 Linux: {share a link to an external page that shares troubleshooting steps or share the procedure as sub-bullets}
 
 ## Best practices
-{Option 1} Our project has adopted the following best practices for contributing:
+Our project has adopted the following best practices for contributing:
 
-{Item 1}
-{Item 2}
-{Item 3}
+Our project uses the  Google's [Python style guide](https://google.github.io/styleguide/pyguide.html) as our parent guide for best practices. Reference the guide to familiarize yourself with the best practices we want contributors to follow.
 
-{Option 2} Our project uses the {name and link to resource for best practices, such as a coding style guide or writing style guide} as our parent guide for best practices. Reference the guide to familiarize yourself with the best practices we want contributors to follow.
-Content style guide
-Read our {name and link to your style guide} to understand our guidelines for writing and formatting documents. The purpose of our style guide is to ensure consistency in the tone, voice, and structure of our documentation.
-Contribution workflow
+## Contribution workflow
 Fork and clone repositories
 {Provide instructions on how to fork and clone your repository. Alternatively, provide a link to a Git guide that explains the process.}
-Report issues and bugs
+## Report issues and bugs
 {Provide instructions on how to report problems.}
-Issue management
+## Issue management
 {Provide instructions on how to create, tag, and assign issues.}
-Commit messages
+## Commit messages
 {Provide instructions on how to format commit messages.}
-Branch creation
+## Branch creation
 {Provide instructions on how to create and/or name a branch.}
-Pull requests
+## Pull requests
 {Provide instructions on how to submit a pull request. Share a link to an example pull request or include the pull request template you want contributors to use within this section.}
-Releases
+## Releases
 {Provide a description of the release process and cadence for the project, such as the source code.}
-Text formats
+## Text formats
 {Provide information on what you need contributors to know and use to edit and create documents.}
 
 
-Explore other templates from The Good Docs Project. Use our feedback form to give feedback on this template.
+Template from The Good Docs Project. 
