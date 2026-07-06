@@ -24,6 +24,10 @@ jobs:
       - name: Fix SSL
         run: echo "SSL_CERT_FILE=$(uv run python -m certifi)" >> $GITHUB_ENV
       - run: uv run zensical build --clean
+      - name: Delete old artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: github-pages
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
