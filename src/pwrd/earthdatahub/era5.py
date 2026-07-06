@@ -19,9 +19,16 @@ def _find_api_endpoint() -> str:
     str
         The url of the endpoint to use
     """
-    hosts = netrc().hosts
-
     endpoint = "api.earthdatahub.destine.eu"
+
+    # If we don't have a netrc file then we will return the API
+    # endpoint, which should postpone any errors to when a user tries
+    # to download a file, at which point they should get 'Unauthorized'
+    try:
+        hosts = netrc().hosts
+    except FileNotFoundError:
+        return endpoint
+
     if endpoint in hosts:
         # "Standard API key exists - good!"
         return endpoint
