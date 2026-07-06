@@ -34,7 +34,7 @@ def _find_api_endpoint() -> str:
             "requires a new API token. Please see "
             "https://earthdatahub.destine.eu/account-settings "
             "for more information. pwrd will use your Classic API "
-            "key but please obtaining a new key.
+            "key but please obtaining a new key."
         )
         warnings.warn(msg)
         return endpoint
