@@ -42,6 +42,7 @@ client = UKPNClient()
 - [x] Northern Power Grid - [`NPGClient`][pwrd.dnos.NPGClient]
 - [x] Scottish Power Energy Networks - [`SPENClient`][pwrd.dnos.SPENClient]
 - [x] National Grid DNO - [`NGEDClient`][pwrd.dnos.NGEDClient]
+- [x] Northern Ireland Electricity Networks - [`NIEClient`][pwrd.dnos.NIEClient] 
 - [ ] Scottish & Southern Electricity Networks
 
 All [`Client`][pwrd.dnos.base.Client] objects act like
