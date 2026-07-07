@@ -145,15 +145,15 @@ When your changes are ready:
    ```
    git push origin your-branch-name
    ```
-2. Open a pull request against the `main` branch of the upstream repository.
+2. Open a pull request against the `main` branch of the upstream repository.  
 3. In your PR description, include:
    - A summary of the changes made
    - The issue number it addresses (e.g. `Closes #42`)
-   - Any relevant context reviewers should know
-4. Confirm that all CI actions pass on your PR.
-5. If needed, address any formatter fails by using `ruff format` locally (see more about formatting [here](https://docs.astral.sh/ruff/formatter/) )
-6. Be responsive to review comments — we aim to review PRs within two weeks.
-7. Once approved, a maintainer will merge your PR.
+   - Any relevant context reviewers should know  
+4. Confirm that all CI actions pass on your PR.  
+5. If needed, address any formatter fails by using `ruff format` locally (see more about formatting [here](https://docs.astral.sh/ruff/formatter/) )  
+6. Be responsive to review comments — we aim to review PRs within two weeks.  
+7. Once approved, a maintainer will merge your PR.  
 
 Please keep pull requests focused and reasonably small — one logical change per PR makes review much easier.
 
