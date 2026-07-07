@@ -81,7 +81,7 @@ If you encounter issues as you set up your environment, refer to the following:
 ## Best practices
 Our project has adopted the following best practices for contributing:
 
-Our project uses [Google's Python style guide](https://google.github.io/styleguide/pyguide.html) as our parent guide for best practices. Reference the guide to familiarise yourself with the best practices we want contributors to follow.
+Our project uses [Ruff's Python style guide](https://docs.astral.sh/ruff/formatter/#style-guide) as our parent guide for best practices. Reference the guide to familiarise yourself with the best practices we want contributors to follow.
 
 ---
 
@@ -150,8 +150,10 @@ When your changes are ready:
    - A summary of the changes made
    - The issue number it addresses (e.g. `Closes #42`)
    - Any relevant context reviewers should know
-4. Be responsive to review comments — we aim to review PRs within two weeks.
-5. Once approved, a maintainer will merge your PR.
+4. Confirm that all CI actions pass on your PR.
+5. If needed, address any formatter fails by using `ruff format` locally (see more about formatting [here](https://docs.astral.sh/ruff/formatter/) )
+6. Be responsive to review comments — we aim to review PRs within two weeks.
+7. Once approved, a maintainer will merge your PR.
 
 Please keep pull requests focused and reasonably small — one logical change per PR makes review much easier.
 
