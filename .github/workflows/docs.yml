@@ -23,6 +23,8 @@ jobs:
         run: uv sync --dev
       - name: Fix SSL
         run: echo "SSL_CERT_FILE=$(uv run python -m certifi)" >> $GITHUB_ENV
+      - name: Copy other files
+        run: cp CONTRIBUTING.md docs/
       - run: uv run zensical build --clean
       - uses: actions/upload-pages-artifact@v5
         with:
