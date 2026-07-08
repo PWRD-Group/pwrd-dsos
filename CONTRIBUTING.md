@@ -141,6 +141,8 @@ Prefixes to use:
 
 ### Pull requests
 When your changes are ready:
+When your changes are ready:
+
 1. Push your branch to your fork:
    ```
    git push origin your-branch-name
@@ -149,7 +151,7 @@ When your changes are ready:
 3. In your PR description, include:
    - A summary of the changes made
    - The issue number it addresses (e.g. `Closes #42`)
-   - Any relevant context reviewers should know
+   - Any relevant context reviewers should know  
 4. Confirm that all CI actions pass on your PR.
 5. If needed, address any formatter fails by using `ruff format` locally (see more about formatting [here](https://docs.astral.sh/ruff/formatter/) )
 6. Be responsive to review comments — we aim to review PRs within two weeks.
