@@ -1,5 +1,13 @@
 # Unplanned incidents in North West England
 
+!!! example "SP Electricity North West Open Data"
+
+	This example uses data from the [SP Electricity North West open data portal][enw_open_data].
+	The datasets used are:
+
+	- SP Electricity North West, SP ENW - Substation - DSO GSP Polygons, https://electricitynorthwest.opendatasoft.com/explore/dataset/enwl-substation-dso-gsp-polygons/information/, 15 May 2026
+    - SP Electricity North West, SP ENW - Operational Data - Historic Unplanned Outages, https://electricitynorthwest.opendatasoft.com/explore/dataset/unplanned-outages/information/, 8 July 2026
+
 ## Incident locations
 
 The following example shows the [`ENWClient`][pwrd.dnos.ENWClient] in
