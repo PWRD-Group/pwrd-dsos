@@ -1,5 +1,19 @@
 # Power lines in South East England
 
+!!! example "UK Power Networks Open Data"
+
+	This example uses data from the [UK Power Networks open data portal][1].
+	The datasets used are:
+
+	- UK Power Networks, Primary Substation Distribution Areas, https://ukpowernetworks.opendatasoft.com/explore/assets/ukpn_primary_postcode_area/, 1 Jun 2026
+	- UK Power Networks, UK Power Networks Licence Area 132kV Overhead Lines, https://ukpowernetworks.opendatasoft.com/explore/assets/ukpn-132kv-overhead-lines/, 31 Mar 2026
+	- UK Power Networks, UK Power Networks Licence Area 66kV Overhead Lines, https://ukpowernetworks.opendatasoft.com/explore/assets/ukpn-66kv-overhead-lines-shapefile/, 31 Mar 2026
+	- UK Power Networks, UK Power Networks Licence Area 33kV Overhead Lines, https://ukpowernetworks.opendatasoft.com/explore/assets/ukpn-33kv-overhead-lines/, 31 Mar 2026
+	- UK Power Networks, UK Power Networks Licence Area LV Overhead Lines, https://ukpowernetworks.opendatasoft.com/explore/assets/ukpn-lv-overhead-lines-shapefile/, 30 Mar 2026
+
+
+
+
 The following example shows how to obtain power lines data for the UK
 Power Networks DNO, and aggregate it by primary area.  To aggregate
 powerline data into areas, we need both the power line data and the
@@ -100,3 +114,6 @@ all_overhead_lines.plot(ax=axes_all, color="red", lw=0.1)
 It takes longer to run (about 40 seconds on an Macbook Pro M1 Pro) but
 gives us the power line length for all overhead power lines in the
 UKPN area.
+
+
+[1]: https://ukpowernetworks.opendatasoft.com/pages/home/
