@@ -117,6 +117,7 @@ def test_resilience(incidents):
 
 
 def test_fault_counts(incidents_with_areas):
+    """Test that we can aggregate fault data into different time periods."""
 
     # These boxes should be as:
     # [3][2]

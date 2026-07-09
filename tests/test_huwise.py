@@ -17,6 +17,7 @@ def test_get_api_key_not_exists(tmp_path):
 
 
 def test_get_api_key_exists(tmp_path):
+    """Test that we can read an API key from a file."""
     dummy_api_key = "XYZ123"
     dummy_data = dedent(f"""\
     [credentials]
@@ -29,6 +30,13 @@ def test_get_api_key_exists(tmp_path):
 
 
 def test_client(httpx_mock):
+    """Test that Client behaves as expected.
+
+    We test:
+    - the client name is what we expect
+    - that we can use the client to query data
+    - the client can return a Resource
+    """
 
     pwrd.dnos.base._get_api_key = Mock(return_value="XYZ")
 
@@ -60,7 +68,21 @@ def test_client(httpx_mock):
 
 
 def test_resource(httpx_mock, tmp_path):
+    """Test that Resource behaves as expected.
 
+    We expect that we should be able to:
+    - get a resource from a client
+    - query the resource name
+    - find out how many records it contains
+    - download/get a file that is allowed
+
+    If we try to download/get a file extension that doesn't exist then
+    we should get a ValueError.
+
+    Interactions with the open data portal are mocked, such that we
+    don't make any HTTP requests (tests should all pass without a
+    network connection).
+    """
     pwrd.dnos.base._get_api_key = Mock(return_value="XYZ")
     client = pwrd.dnos.UKPNClient()
     client.cache_path = tmp_path
