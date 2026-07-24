@@ -4,7 +4,6 @@ import logging
 from functools import cached_property
 from typing import override
 
-
 from pwrd.dnos import base
 
 logger = logging.getLogger(__name__)

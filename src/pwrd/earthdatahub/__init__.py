@@ -2,8 +2,8 @@ from pathlib import Path
 
 import geopandas as gpd
 import xarray as xr
-from zarr.storage import LocalStore
 from zarr.experimental.cache_store import CacheStore
+from zarr.storage import LocalStore
 
 # Type alias for an xarray Dataset or DataArray
 XrLike = xr.Dataset | xr.DataArray
