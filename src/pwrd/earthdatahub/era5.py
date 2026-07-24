@@ -1,7 +1,7 @@
 """ERA5 data stores from <https://earthdatahub.destine.eu>."""
 
-from netrc import netrc
 import warnings
+from netrc import netrc
 
 from zarr.storage import FsspecStore
 

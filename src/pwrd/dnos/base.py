@@ -2,7 +2,7 @@
 
 import logging
 import time
-from collections.abc import Mapping, Iterator
+from collections.abc import Iterator, Mapping
 from functools import cached_property
 from pathlib import Path
 from textwrap import dedent
