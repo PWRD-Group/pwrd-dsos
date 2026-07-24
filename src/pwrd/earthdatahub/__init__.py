@@ -39,6 +39,10 @@ def from_area(xdata: XrLike, area: gpd.GeoDataFrame) -> XrLike:
     # Greenwich meridian, need to concat two slices together
     lats = [(west, 360), (0, east)] if west > east else [(west, east)]
 
+    # Starting from ty-0.0.62 we get an error here, for reasons that
+    # don't seem to make sense. Revisit this in the future but ignore
+    # it for now.
+    # ty: ignore[no-matching-overload]
     out = xr.concat([xdata.sel(longitude=slice(*i)) for i in lats], dim="longitude")
     # Latitude selection presumes ordering from north to south
     return out.sel(latitude=slice(north, south))
